@@ -34,13 +34,13 @@ HEAD = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} — Fin-Audit RL Gym</title>
+<title>{title} — FinSpector</title>
 <meta name="description" content="Среда, в которой ИИ учится находить ошибки в финансовых книгах: вымышленные компании, скрытые расхождения и честная награда.">
 <meta name="theme-color" content="#0A2246">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{title} — Fin-Audit RL Gym">
+<meta property="og:title" content="{title} — FinSpector">
 <meta property="og:description" content="Найдите ошибки в книгах вымышленной компании и получите честный балл от оценщика. Среда для обучения ИИ-аудиторов.">
-<meta property="og:site_name" content="Fin-Audit RL Gym">
+<meta property="og:site_name" content="FinSpector">
 <link rel="preload" href="assets/fonts/inter-tight-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2304070D'/%3E%3Cpath d='M16 5v8M16 19v8M5 16h8M19 16h8' stroke='%23A9CBFF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -49,7 +49,7 @@ HEAD = """<!DOCTYPE html>
 <a class="skip" href="#main">К содержанию</a>
 <div class="progress"></div>
 <header class="top"><div class="bar">
-  <a class="brand" href="index.html">{logo}Fin-Audit</a>
+  <a class="brand" href="index.html">{logo}FinSpector</a>
   <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
   <nav class="menu" id="menu" aria-label="Разделы сайта">{nav}</nav>
 </div></header>
@@ -57,7 +57,7 @@ HEAD = """<!DOCTYPE html>
 """
 
 FOOT = """</main>
-<footer class="bottom"><div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
@@ -102,7 +102,7 @@ def inner_page(f):
     return f"""<section class="panel" data-float="head">
   {grid((22, 78), (78,), ((22, 78), (78, 78)))}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">{p["num"]}</span> · {p["crumb"]}</span><span class="label">Fin-Audit RL Gym</span></div>
+    <div class="crumbs"><span class="label"><span class="num">{p["num"]}</span> · {p["crumb"]}</span><span class="label">FinSpector</span></div>
     <h1 class="title">{p["title"]}</h1>
     <p class="intro" data-r style="--d:3">{p["intro"]}</p>
   </div>
@@ -204,10 +204,10 @@ RINGS = "".join(f'<ellipse cx="60" cy="120" rx="{18 + i * 14}" ry="{8 + i * 7}" 
 INDEX = f"""<section class="panel hero" data-float="hero">
   <div class="stars"></div>{grid((30, 70), (), ())}
   <div class="wrap">
-    <div class="giant" aria-hidden="true">Fin-Audit</div>
+    <div class="giant" aria-hidden="true">FinSpector</div>
     <div class="hero-stage">
       <div class="hero-left" data-r style="--d:6">
-        <h1 class="sr">Fin-Audit RL Gym — среда для обучения ИИ-аудиторов</h1>
+        <h1 class="sr">FinSpector — среда для обучения ИИ-аудиторов</h1>
         <p>Среда, в которой ИИ учится находить ошибки в финансовых книгах. Вымышленные компании, спрятанные расхождения и честная проверка каждого вывода.</p>
         <a class="btn" href="play.html">Попробовать сейчас <span class="arr">→</span></a>
       </div>

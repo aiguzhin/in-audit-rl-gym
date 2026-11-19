@@ -6,7 +6,7 @@
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-display:swap;font-weight:100 800;src:url(fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 [hidden]{display:none!important}
 html{background:#0A2246}
-/* Fin-Audit RL Gym — тёмно-синий «ночной» стиль: светящиеся панели, стекло, тонкая сетка. Шрифты: Inter Tight, JetBrains Mono, Caveat (почерк в книге). */
+/* FinSpector — тёмно-синий «ночной» стиль: светящиеся панели, стекло, тонкая сетка. Шрифты: Inter Tight, JetBrains Mono, Caveat (почерк в книге). */
 :root{
   --frame-a:#0A2246; --frame-b:#1A5BA6;
   --panel:#04070D; --panel-2:#070C16;
@@ -110,7 +110,7 @@ h1.title .ln>span{display:inline-block;transform:translateY(105%);animation:rise
 /* ---------- главная: hero ---------- */
 .hero{min-height:min(860px,calc(100vh - 110px));padding:clamp(28px,4vw,48px) 0 clamp(36px,5vw,64px)}
 .hero .wrap{position:relative;height:100%}
-.giant{position:absolute;left:0;right:0;top:clamp(36px,5vw,70px);text-align:center;font:600 clamp(70px,14.5vw,210px)/.9 var(--sans);letter-spacing:-.06em;white-space:nowrap;
+.giant{position:absolute;left:0;right:0;top:clamp(36px,5vw,70px);text-align:center;font:600 clamp(56px,12.2vw,178px)/.9 var(--sans);letter-spacing:-.06em;white-space:nowrap;
   background:linear-gradient(180deg,#1C4F9C 0%,#2F78E6 45%,rgba(20,60,130,.25) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
   opacity:0;animation:giant 1.4s .1s var(--ease) forwards;pointer-events:none;user-select:none}
 @keyframes giant{from{opacity:0;letter-spacing:-.02em;filter:blur(12px)}to{opacity:1;letter-spacing:-.06em;filter:none}}

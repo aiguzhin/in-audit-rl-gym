@@ -10,7 +10,7 @@
   function authView(mode = "login") {
     const reg = mode === "register";
     root.innerHTML = `<div class="auth-wrap">
-      <div class="auth-side"><p class="label">Аккаунт Fin-Audit</p><h2 class="h2">${reg ? "Создайте профиль" : "С возвращением"}</h2>
+      <div class="auth-side"><p class="label">Аккаунт FinSpector</p><h2 class="h2">${reg ? "Создайте профиль" : "С возвращением"}</h2>
         <p class="intro">Профиль хранит все ваши прохождения, лучший балл, место в рейтинге и достижения. Результаты сохраняются в базе данных и пересчитываются сервером.</p>
         <ul class="perks"><li>История и график прогресса</li><li>8 достижений за честный аудит</li><li>Ваше имя в таблице лидеров</li></ul></div>
       <form class="glass auth-card" id="auth-form" novalidate>
@@ -57,7 +57,7 @@
     root.innerHTML = `
       <div class="pf-head glass">
         <div class="pf-av">${AUTH.initials(u.display)}</div>
-        <div class="pf-id"><h2>${esc(u.display)}</h2><p class="label">@${esc(u.username)} · в Fin-Audit с ${date(u.created_at)}</p></div>
+        <div class="pf-id"><h2>${esc(u.display)}</h2><p class="label">@${esc(u.username)} · в FinSpector с ${date(u.created_at)}</p></div>
         <div class="pf-actions"><a class="btn" href="play.html">Новый аудит <span class="arr">→</span></a><button class="chip" id="logout">Выйти</button></div>
       </div>
       <div class="pf-stats">${[["Прохождений", s.runs], ["Лучший балл", s.best == null ? "—" : fmt(s.best)], ["Средний балл", s.avg == null ? "—" : fmt(s.avg)],
