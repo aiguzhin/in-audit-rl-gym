@@ -49,8 +49,10 @@ HEAD = """<!DOCTYPE html>
 FOOT = """</main>
 <footer class="bottom"><div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
+<script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/guide.js"></script>
 {script}
 </body>
 </html>
@@ -146,6 +148,10 @@ PLAY = """<section class="panel">
       <div id="pl-base-out" class="pl-base-out"></div>
     </div>
   </div>
+  <div class="glass pl-board" id="pl-board" data-r>
+    <div class="pl-board-head"><div><div class="t">Таблица лидеров</div><p class="label">Хранится в базе данных. Каждый результат пересчитан сервером.</p></div><div class="pl-board-stats" id="pl-board-stats"></div></div>
+    <div id="pl-board-body" class="tbl-wrap"></div>
+  </div>
 </div></div></section>
 """
 
@@ -185,6 +191,21 @@ INDEX = f"""<section class="panel hero">
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="panel sec simple-panel">
+  {grid((33.3, 66.6), (), ())}
+  <div class="wrap">
+    <p class="label center">Простыми словами</p>
+    <h2 class="statement" data-r>Как это работает <span class="d">за три шага</span></h2>
+    <div class="simple">
+      <div class="sstep glass" data-r style="--d:0"><span class="sn">1</span><h3>Создаём компанию</h3><p>Программа придумывает компанию на месяц: счета, платежи, курсы валют. И незаметно прячет в книгах несколько ошибок.</p></div>
+      <div class="sstep glass" data-r style="--d:1"><span class="sn">2</span><h3>Агент ищет ошибки</h3><p>ИИ или вы листаете таблицы, сверяете суммы и даты и описываете каждую найденную ошибку с доказательствами.</p></div>
+      <div class="sstep glass" data-r style="--d:2"><span class="sn">3</span><h3>Оценщик ставит балл</h3><p>Оценщик знает, где ошибки, и сравнивает с ними каждый вывод. Балл от −1 до +1, и обмануть его нельзя.</p></div>
+    </div>
+    <div class="cta" data-r style="--d:3"><a class="btn" href="play.html">Попробовать самому <span class="arr">→</span></a></div>
+    <p class="center-sub live" id="live-stats" hidden></p>
   </div>
 </section>
 
@@ -256,6 +277,8 @@ INDEX_SCRIPT = r"""<script>
   $("#perf-rows").innerHTML = ["oracle", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
   onView($("#perf"), () => $("#perf").classList.add("seen"), .3);
+  fetch(window.FA_API + "/api/stats").then(r => r.json()).then(s => { if (!s.runs) return; const el = $("#live-stats");
+    el.innerHTML = `Уже <b>${s.runs}</b> прохождений от <b>${s.players}</b> участников · лучший балл <b>${s.best_reward > 0 ? "+" : ""}${s.best_reward.toFixed(3)}</b>`; el.hidden = false; }).catch(() => {});
   $("#copycmd").onclick = async () => { const b = $("#copycmd");
     try { await navigator.clipboard.writeText("python -m auditenv check"); b.textContent = "Скопировано"; } catch (e) { b.textContent = "Выделите вручную"; }
     setTimeout(() => b.textContent = "Скопировать", 2000); };
