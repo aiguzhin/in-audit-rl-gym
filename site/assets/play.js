@@ -54,8 +54,9 @@ def baseline(name):
         const r = await fetch(`py/auditenv/${f}.py`); if (!r.ok) throw new Error("файл " + f);
         py.FS.writeFile(`/home/pyodide/auditenv/${f}.py`, await r.text()); }));
       py.runPython(`import sys; sys.path.insert(0, "/home/pyodide")\n` + BRIDGE);
-      status("Готово. Выберите компанию и нажмите «Сгенерировать».");
-      $("#pl-gen").disabled = false;
+      status("Готово. Выберите компанию и нажмите «Сгенерировать» или возьмите компанию дня.");
+      $("#pl-gen").disabled = false; $("#pl-daily").disabled = false;
+      if (new URLSearchParams(location.search).get("daily")) daily();
     } catch (e) {
       status(`Не удалось загрузить Python. Проверьте интернет и обновите страницу. <span class="label">(${esc(e.message || e)})</span>`);
     }
@@ -163,8 +164,8 @@ def baseline(name):
       <div class="meters">${[["Точность", g.precision], ["Полнота", g.recall], ["F1", g.f1], ["Шагов", g.inspection_steps]].map(([k, v]) =>
         `<div><span class="label">${k}</span><div class="n">${typeof v === "number" && k !== "Шагов" ? v.toFixed(2) : v}</div></div>`).join("")}</div>
       <button class="btn" id="pl-again">Новая компания <span class="arr">→</span></button></div>
-      <form class="glass pl-save" id="pl-save"><div><div class="t">Сохранить в таблицу лидеров</div><p class="label">Сервер заново создаст эту компанию и сам пересчитает ваш балл.</p></div>
-        <label class="fld"><span>Ваше имя</span><input id="pl-name" maxlength="32" minlength="2" required placeholder="Например, Айгерим" autocomplete="nickname"></label>
+      <form class="glass pl-save" id="pl-save"><div><div class="t">Сохранить в таблицу лидеров</div><p class="label" id="pl-save-who"></p></div>
+        <label class="fld" id="pl-name-wrap"><span>Ваше имя</span><input id="pl-name" maxlength="32" minlength="2" placeholder="Например, Айгерим" autocomplete="nickname"></label>
         <button class="btn" type="submit">Сохранить <span class="arr">→</span></button><p class="save-msg" id="save-msg" role="status" aria-live="polite"></p></form>
       <div class="res-cols"><div class="glass"><div class="t">Ваши выводы</div>${verdicts || '<p class="empty">Вы не отправили выводов.</p>'}</div>
       <div class="glass"><div class="t">Что было спрятано</div>${issues}</div></div>`;
@@ -173,33 +174,25 @@ def baseline(name):
     status("Эпизод завершён. Сравните себя с базовыми политиками ниже.");
   }
 
-  // ---------------------------------------------------------------- таблица лидеров (сервер + база данных)
-  const API = window.FA_API;
-  async function api(path, opts = {}, ms = 70000) { const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
-    try { const r = await fetch(API + path, { ...opts, signal: c.signal }); const body = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(body.error || "Ошибка сервера"); return body; } finally { clearTimeout(t); } }
-  function bindSave(steps) { const f = $("#pl-save"), msg = $("#save-msg");
-    try { $("#pl-name").value = localStorage.getItem("fa-name") || ""; } catch (e) {}
-    f.onsubmit = async e => { e.preventDefault(); const name = $("#pl-name").value.trim();
-      if (name.length < 2) { msg.textContent = "Имя должно содержать от 2 до 32 символов."; return; }
-      const btn = f.querySelector("button"); btn.disabled = true; msg.innerHTML = '<span class="spin"></span>Сохраняем… Если сервер спал, это займёт до минуты.';
-      try { const r = await api("/api/results", { method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, seed: state.seed, preset: state.preset, steps, findings: state.findings }) });
-        try { localStorage.setItem("fa-name", name); } catch (e) {}
-        msg.innerHTML = `Сохранено. Ваше место: <b>${r.rank}</b>. Балл по пересчёту сервера: <b>${r.reward > 0 ? "+" : ""}${r.reward.toFixed(3)}</b>.`;
-        loadBoard(); }
-      catch (err) { btn.disabled = false; msg.textContent = err.name === "AbortError" ? "Сервер не ответил. Попробуйте ещё раз через минуту." : err.message; } }; }
-  const PRESET_RU = { mixed: "обычная", inter: "взаимодействие", clean: "чистая", single: "по одной" };
-  async function loadBoard() { const box = $("#pl-board-body"); if (!box) return;
-    box.innerHTML = '<p class="empty"><span class="spin"></span> Загружаем таблицу… Бесплатный сервер просыпается до минуты.</p>';
-    try { const [b, s] = await Promise.all([api("/api/leaderboard?limit=15"), api("/api/stats")]);
-      $("#pl-board-stats").innerHTML = `<span>Прохождений: <b>${s.runs}</b></span><span>Игроков: <b>${s.players}</b></span><span>Лучший балл: <b>${s.runs ? (s.best_reward > 0 ? "+" : "") + s.best_reward.toFixed(3) : "—"}</b></span>`;
-      box.innerHTML = b.results.length ? `<table class="grid board"><thead><tr><th>#</th><th>Имя</th><th>Награда</th><th>F1</th><th>TP / FP / FN</th><th>Шаги</th><th>Компания</th></tr></thead><tbody>${b.results.map((r, i) =>
-        `<tr style="--k:${i}"><td>${i + 1}</td><td>${esc(r.name)}</td><td class="num"><em class="${r.reward < 0 ? "neg" : "pos"}">${r.reward > 0 ? "+" : ""}${r.reward.toFixed(3)}</em></td><td class="num">${(r.f1 ?? 0).toFixed(2)}</td><td>${r.tp} / ${r.fp} / ${r.fn}</td><td class="num">${r.steps}</td><td>№${r.seed} · ${PRESET_RU[r.preset] || r.preset}</td></tr>`).join("")}</tbody></table>`
-        : '<p class="empty">Пока никто не сохранил результат. Станьте первым!</p>'; }
-    catch (err) { box.innerHTML = `<p class="empty">Таблица сейчас недоступна: ${esc(err.name === "AbortError" ? "сервер не ответил" : err.message)}. <button class="chip" id="pl-board-retry">Повторить</button></p>`;
-      $("#pl-board-retry").onclick = loadBoard; } }
-  loadBoard();
+  // ---------------------------------------------------------------- сохранение результата (сервер + база данных)
+  function bindSave(steps) { const f = $("#pl-save"), msg = $("#save-msg"), u = AUTH.user();
+    if (u) { $("#pl-name-wrap").hidden = true; $("#pl-save-who").innerHTML = `Сохранится в профиль <b>${esc(u.display)}</b>.`; }
+    else { try { $("#pl-name").value = localStorage.getItem("fa-name") || ""; } catch (e) {}
+      $("#pl-save-who").innerHTML = '<a href="profile.html">Войдите</a>, чтобы результаты копились в профиле и открывали достижения.'; }
+    f.onsubmit = async e => { e.preventDefault(); const name = u ? null : $("#pl-name").value.trim();
+      if (!u && name.length < 2) { msg.textContent = "Имя должно содержать от 2 до 32 символов."; return; }
+      const btn = f.querySelector("button"); btn.disabled = true; msg.innerHTML = '<span class="spin"></span>Сервер пересчитывает ваш результат…';
+      try { const r = await AUTH.api("/api/results", { method: "POST", body: { name, seed: state.seed, preset: state.preset, steps, findings: state.findings } });
+        if (!u) try { localStorage.setItem("fa-name", name); } catch (e) {}
+        msg.innerHTML = `Сохранено. ${r.daily ? "Место в рейтинге дня" : "Место в общем рейтинге"}: <b>#${r.rank}</b>. Балл по пересчёту сервера: <b>${r.reward > 0 ? "+" : ""}${r.reward.toFixed(3)}</b>. <a href="leaders.html">Таблица лидеров →</a>${u ? ' · <a href="profile.html">Профиль →</a>' : ""}`; }
+      catch (err) { btn.disabled = false; msg.textContent = err.message; } }; }
+
+  // ---------------------------------------------------------------- компания дня
+  async function daily() { const b = $("#pl-daily"); b.disabled = true; status("Узнаём компанию дня…", true);
+    try { const d = await AUTH.api("/api/daily", { auth: false }); $("#pl-seed").value = d.seed; $("#pl-preset").value = "mixed";
+      state = null; $("#pl-gen").click(); status(`Компания дня №${d.seed}. У всех сегодня одна и та же — сравните себя с другими.`); }
+    catch (e) { status(esc(e.message)); } finally { b.disabled = false; } }
+  $("#pl-daily").onclick = daily;
 
   $$(".pl-base-btns .chip").forEach(b => b.onclick = () => { if (!state) return; const name = b.dataset.p; b.disabled = true;
     const out = $("#pl-base-out"); const old = $("#br-" + name); if (old) old.remove(); out.insertAdjacentHTML("beforeend", `<div class="br" id="br-${name}"><b>${b.textContent}</b><span>считаем…</span></div>`);

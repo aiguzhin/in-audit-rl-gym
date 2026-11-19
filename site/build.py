@@ -12,13 +12,19 @@ INNER, SCRIPT = PARTS["inner"], PARTS["scripts"]
 PAGES = [
     ("index.html", "00", "Главная"),
     ("play.html", "01", "Песочница"),
-    ("episode.html", "02", "Эпизод"),
-    ("books.html", "03", "Книги"),
-    ("run.html", "04", "Прогон"),
-    ("reward.html", "05", "Награда"),
-    ("policies.html", "06", "Политики"),
-    ("start.html", "07", "Запуск"),
+    ("leaders.html", "02", "Лидеры"),
+    ("episode.html", "03", "Как устроено"),
+    ("reward.html", "04", "Награда"),
+    ("start.html", "05", "Для жюри"),
+    ("books.html", "06", "Книги эпизода"),
+    ("run.html", "07", "Прогон политики"),
+    ("policies.html", "08", "Базовые политики"),
+    ("profile.html", "09", "Профиль"),
 ]
+NAV = ["play.html", "leaders.html", "episode.html", "reward.html", "start.html"]
+NEXT = {"index.html": "play.html", "play.html": "leaders.html", "leaders.html": "episode.html", "episode.html": "reward.html",
+        "reward.html": "start.html", "start.html": "play.html", "books.html": "run.html", "run.html": "policies.html",
+        "policies.html": "start.html", "profile.html": "play.html"}
 
 LOGO = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">'
         '<path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>')
@@ -31,6 +37,10 @@ HEAD = """<!DOCTYPE html>
 <title>{title} — Fin-Audit RL Gym</title>
 <meta name="description" content="Среда, в которой ИИ учится находить ошибки в финансовых книгах: вымышленные компании, скрытые расхождения и честная награда.">
 <meta name="theme-color" content="#0A2246">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{title} — Fin-Audit RL Gym">
+<meta property="og:description" content="Найдите ошибки в книгах вымышленной компании и получите честный балл от оценщика. Среда для обучения ИИ-аудиторов.">
+<meta property="og:site_name" content="Fin-Audit RL Gym">
 <link rel="preload" href="assets/fonts/inter-tight-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2304070D'/%3E%3Cpath d='M16 5v8M16 19v8M5 16h8M19 16h8' stroke='%23A9CBFF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -52,6 +62,7 @@ FOOT = """</main>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/auth.js"></script>
 <script src="assets/guide.js"></script>
 {script}
 </body>
@@ -60,10 +71,12 @@ FOOT = """</main>
 
 
 def nav(active):
+    names = {f: n for f, _, n in PAGES}
     out = []
-    for f, _, name in PAGES[1:]:
-        cur = ' class="on" aria-current="page"' if f == active else ""
-        out.append(f'<a href="{f}"{cur}>{name}</a>')
+    for f in NAV:
+        on = f == active or (f == "start.html" and active in ("books.html", "run.html", "policies.html"))
+        cur = ' class="on" aria-current="page"' if on else ""
+        out.append(f'<a href="{f}"{cur}>{names[f]}</a>')
     return "".join(out)
 
 
@@ -76,11 +89,10 @@ def grid(vs=(), hs=(), nodes=()):
 
 
 def next_panel(f):
-    i = [p[0] for p in PAGES].index(f)
-    nf, _, name = PAGES[i + 1] if i + 1 < len(PAGES) else PAGES[1]
-    lab = "Следующий раздел" if i + 1 < len(PAGES) else "Вернуться к началу"
-    return (f'<section class="panel"><div class="wrap"><a class="next" href="{nf}"><div><span class="label">{lab}</span>'
-            f'<div class="t">{name}</div></div><span class="go">→</span></a></div></section>\n')
+    names = {p[0]: p[2] for p in PAGES}
+    nf = NEXT[f]
+    return (f'<section class="panel"><div class="wrap"><a class="next" href="{nf}"><div><span class="label">Дальше</span>'
+            f'<div class="t">{names[nf]}</div></div><span class="go">→</span></a></div></section>\n')
 
 
 def inner_page(f):
@@ -113,6 +125,7 @@ PLAY = """<section class="panel">
     <label class="fld"><span>Сценарий</span><select id="pl-preset">
       <option value="mixed">Обычная компания</option><option value="inter">Взаимодействующие ошибки</option><option value="clean">Чистая компания</option><option value="single">Одна ошибка каждого типа</option></select></label>
     <button class="btn" id="pl-gen" disabled>Сгенерировать <span class="arr">→</span></button>
+    <button class="btn ghost" id="pl-daily" type="button" disabled><span class="dot"></span>Компания дня</button>
     <div class="pl-status" id="pl-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
   </div>
   <div id="pl-work" hidden>
@@ -148,11 +161,33 @@ PLAY = """<section class="panel">
       <div id="pl-base-out" class="pl-base-out"></div>
     </div>
   </div>
-  <div class="glass pl-board" id="pl-board" data-r>
-    <div class="pl-board-head"><div><div class="t">Таблица лидеров</div><p class="label">Хранится в базе данных. Каждый результат пересчитан сервером.</p></div><div class="pl-board-stats" id="pl-board-stats"></div></div>
-    <div id="pl-board-body" class="tbl-wrap"></div>
-  </div>
 </div></div></section>
+"""
+
+LEADERS = """<section class="panel">
+  {grid}<div class="stars" style="opacity:.5"></div>
+  <div class="wrap page-head">
+    <div class="crumbs"><span class="label"><span class="num">02</span> · Лидеры</span><span class="label">Результаты из базы данных</span></div>
+    <h1 class="title">Таблица<br>лидеров</h1>
+    <p class="intro" data-r style="--d:3">Каждый результат сервер пересчитывает сам: заново создаёт ту же компанию и сверяет выводы с эталоном. Поэтому балл здесь честный.</p>
+  </div>
+</section>
+<section class="panel"><div class="content"><div class="wrap">
+  <div class="lb-stats" id="lb-stats" data-r></div>
+  <div class="lb-bar" data-r><div class="seg" role="tablist" aria-label="Период"><button type="button" role="tab" aria-selected="true" data-s="daily">Компания дня</button><button type="button" role="tab" aria-selected="false" data-s="all">Всё время</button></div><p class="label" id="lb-day"></p></div>
+  <div class="glass lb-card" data-r><div class="tbl-wrap" id="lb-body"></div></div>
+</div></div></section>
+"""
+
+PROFILE = """<section class="panel"><div class="content"><div class="wrap" id="profile"><p class="empty"><span class="spin"></span> Загружаем…</p></div></div></section>
+"""
+
+NOTFOUND = """<section class="panel hero-404">
+  <div class="stars"></div>{grid}
+  <div class="wrap nf"><div class="nf-code">404</div><h1 class="title">Такой страницы<br>нет в книгах</h1>
+    <p class="intro">Похоже, ссылка устарела или в адресе опечатка. Как и ошибка в проводке — бывает.</p>
+    <div class="cta"><a class="btn" href="index.html">На главную <span class="arr">→</span></a><a class="btn ghost" href="play.html"><span class="dot"></span>В песочницу</a></div></div>
+</section>
 """
 
 BOOK = """<div class="book-stage" aria-hidden="true"><div class="book-glow"></div><div class="book-float"><div class="book3">
@@ -181,13 +216,6 @@ INDEX = f"""<section class="panel hero">
           <svg class="leader" viewBox="0 0 120 120"><path d="M118 2H64L6 40v40"/></svg>
           <div class="big">20/20<small>эпизодов</small></div>
           <div class="row">Проверено без сети</div>
-        </div>
-        <div class="glass mini" data-r style="--d:11">
-          <div class="t">Сверка</div>
-          <div class="row"><span>1200 Дебиторка</span><b>93 049</b></div>
-          <div class="row"><span>4000 Выручка</span><b>93 049</b></div>
-          <div class="row err"><span>Дубль счёта</span><b>+93 049</b></div>
-          <div class="foot">1 расхождение<small>найдено с доказательствами</small></div>
         </div>
       </div>
     </div>
@@ -289,6 +317,10 @@ for f, num, name in PAGES:
     title = "Среда для ИИ-аудиторов" if f == "index.html" else name
     if f == "index.html":
         body, script = INDEX, INDEX_SCRIPT
+    elif f == "leaders.html":
+        body, script = LEADERS.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))), '<script src="assets/leaders.js"></script>'
+    elif f == "profile.html":
+        body, script = PROFILE, '<script src="assets/profile.js"></script>'
     elif f == "play.html":
         body = PLAY.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78))))
         script = '<script src="assets/play.js"></script>'
@@ -296,4 +328,6 @@ for f, num, name in PAGES:
         body, script = inner_page(f), SCRIPT.get(f, "")
     html = HEAD.format(title=title, slug=f[:-5], nav=nav(f), logo=LOGO) + body + next_panel(f) + FOOT.format(script=script)
     (ROOT / f).write_text(html, encoding="utf-8")
-print("built", len(PAGES), "pages")
+nf = HEAD.format(title="Страница не найдена", slug="404", nav=nav(""), logo=LOGO) + NOTFOUND.replace("{grid}", grid((30, 70), (), ())) + FOOT.format(script="")
+(ROOT / "404.html").write_text(nf, encoding="utf-8")
+print("built", len(PAGES) + 1, "pages")

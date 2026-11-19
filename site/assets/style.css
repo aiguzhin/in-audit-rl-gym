@@ -5,6 +5,7 @@
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-display:swap;font-weight:100 800;src:url(fonts/jetbrains-mono-cyrillic-wght-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-display:swap;font-weight:100 800;src:url(fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 [hidden]{display:none!important}
+html{background:#0A2246}
 /* Fin-Audit RL Gym — тёмно-синий «ночной» стиль: светящиеся панели, стекло, тонкая сетка. Шрифты: Inter Tight, JetBrains Mono, Caveat (почерк в книге). */
 :root{
   --frame-a:#0A2246; --frame-b:#1A5BA6;
@@ -486,9 +487,9 @@ header.top .bar{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 30px -10px
 .pl-board-stats b{color:#fff;font-family:var(--mono)}
 table.board td{font-family:var(--sans);font-size:14px}
 table.board td:first-child{color:var(--dim);width:40px}
-table.board tr:nth-child(1) td:first-child{color:#FFD86B;font-weight:700}
-table.board tr:nth-child(2) td:first-child{color:#D9E2F2;font-weight:700}
-table.board tr:nth-child(3) td:first-child{color:#E6A877;font-weight:700}
+table.board.rank tr:nth-child(1) td:first-child{color:#FFD86B;font-weight:700}
+table.board.rank tr:nth-child(2) td:first-child{color:#D9E2F2;font-weight:700}
+table.board.rank tr:nth-child(3) td:first-child{color:#E6A877;font-weight:700}
 .pl-save{display:grid;grid-template-columns:1.2fr 1fr auto;gap:16px;align-items:end;padding:20px}
 .pl-save .t{font:500 18px var(--sans)}
 .save-msg{grid-column:1/-1;font-size:14.5px;color:var(--muted);display:flex;align-items:center;gap:8px;min-height:1px}
@@ -538,3 +539,90 @@ body.touring .fab{z-index:210}
 .asst-form input:focus{border-color:var(--blue)}
 .asst-form button{width:46px;height:46px;border-radius:50%;border:0;background:#fff;color:#05080F;font-size:18px;cursor:pointer}
 @media(max-width:560px){.fab span:last-child{display:none}.fab{padding:16px}.asst{right:10px;bottom:80px}}
+
+/* ---------- аккаунт в шапке ---------- */
+.acct{display:inline-flex;align-items:center;gap:9px;margin-left:8px;order:3;text-decoration:none;font:500 14.5px var(--sans);color:var(--text);padding:5px 14px 5px 5px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-b);transition:background .2s,border-color .2s;min-height:40px}
+.acct:hover{background:rgba(74,144,255,.18);border-color:rgba(74,144,255,.5)}
+.acct .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--sans);background:linear-gradient(140deg,#7FB2FF,#2F6FD8);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 2px 8px rgba(0,0,0,.4)}
+.acct:not(.in) .av{background:#fff;color:#05080F}
+.acct[aria-current] {border-color:var(--blue)}
+.guide-btn{padding:8px;min-width:40px;justify-content:center}
+.guide-btn{font-size:0;gap:0}.guide-btn span{font-size:13px}
+@media(max-width:1000px){.acct .nm{display:none}.acct{padding:5px;margin-left:auto}.guide-btn{margin-left:8px}}
+
+/* ---------- сегменты ---------- */
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid var(--glass-b);box-shadow:inset 0 2px 6px rgba(0,0,0,.4)}
+.seg button{font:500 14.5px var(--sans);color:var(--muted);background:none;border:0;border-radius:999px;padding:10px 18px;cursor:pointer;transition:.25s var(--ease)}
+.seg button[aria-selected=true]{background:#fff;color:#05080F;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+
+/* ---------- вход / регистрация ---------- */
+.auth-wrap{display:grid;grid-template-columns:1fr 440px;gap:clamp(24px,5vw,72px);align-items:center;padding:clamp(20px,4vw,48px) 0}
+.auth-side .intro{margin-top:16px}
+.perks{list-style:none;margin-top:26px;display:grid;gap:12px}
+.perks li{display:flex;gap:12px;align-items:center;font-size:16px;color:#D6E0F2}
+.perks li::before{content:"";width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff;flex:none}
+.auth-card{padding:24px;display:flex;flex-direction:column;gap:14px}
+.auth-card .seg{align-self:flex-start;margin-bottom:6px}
+.auth-card .btn{justify-content:space-between}
+.fine{font-size:12.5px}
+@media(max-width:900px){.auth-wrap{grid-template-columns:1fr}}
+
+/* ---------- профиль ---------- */
+.pf-head{display:flex;align-items:center;gap:20px;padding:24px;flex-wrap:wrap}
+.pf-av{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font:600 26px var(--sans);color:#fff;background:linear-gradient(140deg,#8CC0FF,#1E5CC6);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 0 0 6px rgba(74,144,255,.15),0 12px 30px -8px rgba(0,0,0,.8)}
+.pf-id{flex:1;min-width:200px}.pf-id h2{font:500 clamp(28px,3.2vw,40px)/1.05 var(--sans);letter-spacing:-.04em}
+.pf-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pf-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0}
+.pf-stats>div,.lb-stats>div{padding:16px}
+.pf-stats b,.lb-stats b{display:block;font:500 clamp(22px,2.4vw,32px)/1 var(--sans);letter-spacing:-.04em;margin-top:10px}
+.pf-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:14px;align-items:start}
+.pf-card{padding:22px}
+.pf-card .t{font:500 20px var(--sans);letter-spacing:-.02em;display:flex;gap:10px;align-items:baseline;margin-bottom:6px}
+.chart{width:100%;height:auto;margin-top:12px;overflow:visible}
+.chart .zero{stroke:var(--line-2);stroke-dasharray:4 4}
+.chart .ln{fill:none;stroke:url(#none);stroke:#A9CBFF;stroke-width:2.2;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(74,144,255,.6))}
+.chart .area{fill:rgba(74,144,255,.12)}
+.chart circle.pos{fill:#B9F5D4}.chart circle.neg{fill:#FF8A7E}
+.ach{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.ach .a{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--glass-b);opacity:.55}
+.ach .a.done{opacity:1;border-color:rgba(91,227,164,.45);background:rgba(91,227,164,.08)}
+.ach .ai{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:700}
+.ach .a.done .ai{background:var(--ok);color:#05080F;box-shadow:0 0 14px rgba(91,227,164,.6)}
+.ach b{display:block;font:500 14.5px var(--sans)}.ach span{font-size:12.5px;color:var(--muted)}
+.tag-day{font:600 10.5px var(--sans);padding:2px 7px;border-radius:999px;background:rgba(74,144,255,.25);color:#CFE1FF;margin-left:4px}
+.tag-ok{color:var(--ok);font-weight:700}
+@media(max-width:1100px){.pf-stats{grid-template-columns:repeat(3,1fr)}.pf-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.pf-stats{grid-template-columns:1fr 1fr}.ach{grid-template-columns:1fr}}
+
+/* ---------- лидеры ---------- */
+.lb-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.lb-bar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:22px 0 14px}
+.lb-bar .label{font-size:14px}.lb-bar .label b{color:#fff}.lb-bar a{color:var(--blue-2)}
+.lb-card{padding:6px;overflow:hidden}
+table.board.big td{padding:14px 12px;font-size:15px}
+table.board tr.mine td{background:rgba(74,144,255,.18)}
+.empty-state{text-align:center;padding:56px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty-state b{font:500 22px var(--sans);letter-spacing:-.03em}.empty-state p{color:var(--muted)}
+.empty-state .btn{margin-top:12px}
+@media(max-width:700px){.lb-stats{grid-template-columns:1fr 1fr}}
+
+/* ---------- для жюри ---------- */
+.jury{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.jl{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px;text-decoration:none;min-height:190px;transition:transform .3s var(--ease),border-color .3s}
+.jl:hover{transform:translateY(-4px);border-color:rgba(74,144,255,.55)}
+.jl .k{font:500 12px var(--mono);color:var(--blue-2)}
+.jl b{font:500 20px/1.15 var(--sans);letter-spacing:-.03em;margin-top:auto}
+.jl span:not(.k){color:var(--muted);font-size:14px}
+.jl i{position:absolute;top:18px;right:18px;font-style:normal;width:34px;height:34px;border-radius:50%;background:#fff;color:#05080F;display:grid;place-items:center;transition:transform .3s var(--ease)}
+.jl:hover i{transform:translateX(3px)}
+@media(max-width:1000px){.jury{grid-template-columns:1fr 1fr}}@media(max-width:560px){.jury{grid-template-columns:1fr}}
+
+/* ---------- 404 ---------- */
+.hero-404 .nf{padding:clamp(60px,9vw,130px) var(--pad);text-align:center;display:flex;flex-direction:column;align-items:center}
+.nf-code{font:600 clamp(110px,22vw,280px)/.85 var(--sans);letter-spacing:-.07em;background:linear-gradient(180deg,#2F78E6,rgba(20,60,130,.15));-webkit-background-clip:text;background-clip:text;color:transparent}
+.nf .intro{margin-left:auto;margin-right:auto}.nf .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+
+/* ---------- подсветка за курсором ---------- */
+.glass,.panel{--mx:-999px;--my:-999px}
+.glass{background-image:radial-gradient(420px circle at var(--mx) var(--my),rgba(120,170,255,.13),transparent 45%),linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03))}
+.panel::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(700px circle at var(--mx) var(--my),rgba(74,144,255,.07),transparent 50%)}

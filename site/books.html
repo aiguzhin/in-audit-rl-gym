@@ -3,9 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Книги — Fin-Audit RL Gym</title>
+<title>Книги эпизода — Fin-Audit RL Gym</title>
 <meta name="description" content="Среда, в которой ИИ учится находить ошибки в финансовых книгах: вымышленные компании, скрытые расхождения и честная награда.">
 <meta name="theme-color" content="#0A2246">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Книги эпизода — Fin-Audit RL Gym">
+<meta property="og:description" content="Найдите ошибки в книгах вымышленной компании и получите честный балл от оценщика. Среда для обучения ИИ-аудиторов.">
+<meta property="og:site_name" content="Fin-Audit RL Gym">
 <link rel="preload" href="assets/fonts/inter-tight-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2304070D'/%3E%3Cpath d='M16 5v8M16 19v8M5 16h8M19 16h8' stroke='%23A9CBFF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -16,13 +20,13 @@
 <header class="top"><div class="bar">
   <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>Fin-Audit</a>
   <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
-  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html">Песочница</a><a href="episode.html">Эпизод</a><a href="books.html" class="on" aria-current="page">Книги</a><a href="run.html">Прогон</a><a href="reward.html">Награда</a><a href="policies.html">Политики</a><a href="start.html">Запуск</a></nav>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html">Песочница</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a><a href="start.html" class="on" aria-current="page">Для жюри</a></nav>
 </div></header>
 <main id="main">
 <section class="panel">
   <div class="grid-lines" aria-hidden="true"><i class="v" style="left:22%"></i><i class="v" style="left:78%"></i><i class="h" style="top:78%"></i><b style="left:22%;top:78%"></b><b style="left:78%;top:78%"></b></div><div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">03</span> · Книги</span><span class="label">Fin-Audit RL Gym</span></div>
+    <div class="crumbs"><span class="label"><span class="num">06</span> · Книги</span><span class="label">Fin-Audit RL Gym</span></div>
     <h1 class="title">Открытые<br>книги</h1>
     <p class="intro" data-r style="--d:3">Настоящий dev-эпизод с двумя сценариями взаимодействующих ошибок. Агент видит только эти таблицы. Включите режим оценщика и нажмите на ошибку: её доказательства подсветятся.</p>
   </div>
@@ -44,13 +48,14 @@
     <aside class="ex-side" aria-label="Эталон"><span class="label">Эталон · truth.json</span><div id="side" aria-live="polite"></div></aside>
   </div>
 </div></div></section>
-<section class="panel"><div class="wrap"><a class="next" href="run.html"><div><span class="label">Следующий раздел</span><div class="t">Прогон</div></div><span class="go">→</span></a></div></section>
+<section class="panel"><div class="wrap"><a class="next" href="run.html"><div><span class="label">Дальше</span><div class="t">Прогон политики</div></div><span class="go">→</span></a></div></section>
 </main>
 <footer class="bottom"><div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/auth.js"></script>
 <script src="assets/guide.js"></script>
 <script>
 (function(){ const {$, $$, esc, money, typeRu, evAll} = UI; const m = D.manifest;
