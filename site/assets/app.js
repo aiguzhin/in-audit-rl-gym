@@ -53,26 +53,5 @@
   function onView(el, fn, threshold = .35) { if (!el) return;
     const o = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fn(); o.disconnect(); } }), { threshold }); o.observe(el); }
 
-  // ---------- фон с книгами ----------
-  (function () {
-    const closed = (w = 120, h = 160) => `<svg viewBox="0 0 ${w} ${h}" fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="6" width="${w - 20}" height="${h - 12}" rx="6"/><path d="M24 6v${h - 12}"/><rect x="38" y="30" width="${w - 62}" height="26" rx="3"/><path d="M44 40h${w - 74}M44 47h${w - 90}"/><path d="M38 ${h - 34}h${w - 62}M38 ${h - 26}h${w - 80}"/><path d="M${w - 30} 6v40l8-7 8 7V6" fill="currentColor" fill-opacity=".25"/></svg>`;
-    const open = () => `<svg viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="2"><path d="M110 22C80 8 40 8 12 16v108c28-8 68-8 98 6 30-14 70-14 98-6V16C180 8 140 8 110 22z"/><path d="M110 22v108"/>${[0,1,2,3,4,5,6].map(i => `<path d="M26 ${40 + i * 12}h${64 - (i % 3) * 10}M130 ${40 + i * 12}h${64 - ((i + 1) % 3) * 10}"/>`).join("")}<ellipse cx="160" cy="76" rx="34" ry="11" stroke-width="2.4"/></svg>`;
-    const stack = () => `<svg viewBox="0 0 200 130" fill="none" stroke="currentColor" stroke-width="2"><rect x="20" y="86" width="168" height="30" rx="4"/><path d="M34 86v30M160 96h16M160 104h10"/><rect x="10" y="54" width="160" height="30" rx="4" transform="rotate(-3 90 69)"/><path d="M26 56v28" transform="rotate(-3 90 69)"/><rect x="30" y="22" width="150" height="30" rx="4" transform="rotate(4 105 37)"/><path d="M46 22v30M120 32h40M120 40h28" transform="rotate(4 105 37)"/></svg>`;
-    const items = [
-      [closed(), "6%", "16%", 120, 22, -8, 6, ""], [open(), "78%", "8%", 230, 26, 3, -4, ""], [stack(), "84%", "62%", 200, 30, -4, 3, ""],
-      [closed(140, 180), "2%", "70%", 130, 24, 10, -2, ""], [open(), "34%", "86%", 200, 28, -2, 5, "red"], [closed(), "56%", "40%", 90, 20, 14, 2, ""],
-      [stack(), "18%", "44%", 150, 34, 2, -6, ""], [closed(), "92%", "30%", 80, 19, -14, -4, "red"]];
-    const host = document.createElement("div"); host.className = "bg-books"; host.setAttribute("aria-hidden", "true");
-    host.innerHTML = `<div class="lines"></div><div class="margin"></div>` + items.map(([svg, x, y, w, dur, r0, r1, cls], i) =>
-      `<div class="bk ${cls}" data-sp="${(.04 + (i % 4) * .035).toFixed(3)}" style="left:${x};top:${y};width:${w}px;--dur:${dur}s;--del:${-i * 2.3}s;--r0:${r0}deg;--r1:${r1}deg">${svg}</div>`).join("");
-    document.body.prepend(host);
-    if (reduce) return;
-    const bks = [...host.querySelectorAll(".bk")]; let mx = 0, my = 0, raf = 0;
-    function apply() { raf = 0; const y = scrollY; bks.forEach((b, i) => { const s = +b.dataset.sp;
-      b.style.transform = `translate3d(${mx * s * 120}px, ${-y * s + my * s * 80}px, 0)`; }); }
-    addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
-    addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
-  })();
-
   window.UI = { $, $$, esc, money, typeRu, evAll, countUp, onView, reduce };
 })();
