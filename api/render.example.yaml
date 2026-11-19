@@ -1,0 +1,18 @@
+# Пример конфигурации API для Render. База данных — Neon (Postgres):
+# строку подключения Neon вставьте в переменную DATABASE_URL на странице Environment сервиса.
+
+services:
+  - type: web
+    name: fin-audit-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r api/requirements.txt
+    startCommand: python api/server.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ALLOWED_ORIGINS
+        value: https://fin-audit-rl-gym.onrender.com
+      - key: DATABASE_URL
+        sync: false
