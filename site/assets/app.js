@@ -4,7 +4,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const exps = (window.D && D.manifest.currency_exponents) || {};
+  const exps = Object.assign({ USD: 2, EUR: 2, GBP: 2, KZT: 2, CNY: 2, JPY: 0, KWD: 3 }, (window.D && D.manifest.currency_exponents) || {});
   const money = (minor, cur) => { const e = exps[cur] ?? 2;
     return (minor / Math.pow(10, e)).toLocaleString("ru-RU", { minimumFractionDigits: e, maximumFractionDigits: e }) + " " + cur; };
   const typeRu = { duplicate_invoice: "Дубль счёта", missing_or_partial_allocation: "Неполное разнесение",

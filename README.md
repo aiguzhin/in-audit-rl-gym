@@ -100,3 +100,8 @@ obs, reward, terminated, truncated, info = env.step(
 - Обучение весов не проводилось.
 
 Все компании, люди, счета и деньги вымышлены. Лицензия MIT.
+
+## Сайт
+
+Сайт лежит в `site/`, собирается командой `python site/build.py` и выкладывается на Render как статический сайт (папка `site`).
+Страница «Песочница» (`play.html`) запускает пакет `auditenv` прямо в браузере через Pyodide. Копия пакета лежит в `site/py/auditenv/`; после изменения кода обновите её: `cp auditenv/*.py site/py/auditenv/`.

@@ -11,12 +11,13 @@ INNER, SCRIPT = PARTS["inner"], PARTS["scripts"]
 
 PAGES = [
     ("index.html", "00", "Главная"),
-    ("episode.html", "01", "Эпизод"),
-    ("books.html", "02", "Книги"),
-    ("run.html", "03", "Прогон"),
-    ("reward.html", "04", "Награда"),
-    ("policies.html", "05", "Политики"),
-    ("start.html", "06", "Запуск"),
+    ("play.html", "01", "Песочница"),
+    ("episode.html", "02", "Эпизод"),
+    ("books.html", "03", "Книги"),
+    ("run.html", "04", "Прогон"),
+    ("reward.html", "05", "Награда"),
+    ("policies.html", "06", "Политики"),
+    ("start.html", "07", "Запуск"),
 ]
 
 LOGO = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">'
@@ -95,6 +96,59 @@ def inner_page(f):
 """
 
 
+
+PLAY = """<section class="panel">
+  {grid}<div class="stars" style="opacity:.5"></div>
+  <div class="wrap page-head">
+    <div class="crumbs"><span class="label"><span class="num">01</span> · Песочница</span><span class="label">Настоящая среда · Python в браузере</span></div>
+    <h1 class="title">Проведите<br>аудит сами</h1>
+    <p class="intro" data-r style="--d:3">Здесь работает та же среда на Python, что и в проверке. Сгенерируйте компанию, найдите ошибки и отправьте выводы. Оценщик посчитает награду по тем же правилам, что и для ИИ.</p>
+  </div>
+</section>
+<section class="panel"><div class="content"><div class="wrap">
+  <div class="pl-bar glass" data-r>
+    <label class="fld"><span>Номер компании</span><input id="pl-seed" type="number" min="0" max="999999" value="2026"></label>
+    <label class="fld"><span>Сценарий</span><select id="pl-preset">
+      <option value="mixed">Обычная компания</option><option value="inter">Взаимодействующие ошибки</option><option value="clean">Чистая компания</option><option value="single">Одна ошибка каждого типа</option></select></label>
+    <button class="btn" id="pl-gen" disabled>Сгенерировать <span class="arr">→</span></button>
+    <div class="pl-status" id="pl-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
+  </div>
+  <div id="pl-work" hidden>
+    <div class="pl-meta" id="pl-meta"></div>
+    <div class="pl-grid">
+      <div class="pl-books glass">
+        <div class="ex-bar"><button class="tab" data-t="ledger" aria-pressed="true">Журнал</button><button class="tab" data-t="invoices" aria-pressed="false">Счета</button><button class="tab" data-t="payments" aria-pressed="false">Платежи</button><button class="tab" data-t="fx" aria-pressed="false">Курсы</button>
+          <span class="steps-left" id="pl-steps"></span></div>
+        <div class="pl-hint">Нажмите на ID в таблице, чтобы добавить его в доказательства. С зажатым Shift ID попадёт в «затронутые». Каждая страница таблицы тратит один шаг из 100.</div>
+        <div class="tbl-wrap"><table class="grid" id="pl-tbl"></table></div>
+        <div class="pl-pager"><button class="chip" id="pl-more">Загрузить ещё 50 строк</button><span id="pl-count" class="label"></span></div>
+      </div>
+      <div class="pl-side">
+        <form class="glass pl-form" id="pl-form">
+          <div class="t">Новый вывод</div>
+          <label class="fld"><span>Тип ошибки</span><select id="f-type"><option value="duplicate_invoice">Дубль счёта</option><option value="missing_or_partial_allocation">Неполное разнесение</option><option value="fx_conversion_error">Неверный курс</option><option value="period_cutoff_error">Не тот период</option></select></label>
+          <label class="fld"><span>Затронутые ID</span><input id="f-aff" placeholder="INV-…, PAY-…" autocomplete="off"></label>
+          <div class="two"><label class="fld"><span>Сумма, мин. ед.</span><input id="f-amt" type="number" min="0" placeholder="0"></label>
+          <label class="fld"><span>Валюта</span><select id="f-cur"></select></label></div>
+          <label class="fld"><span>Доказательства</span><input id="f-ev" placeholder="DOC-…, L-…, fx:…" autocomplete="off"></label>
+          <label class="fld"><span>Пояснение</span><input id="f-exp" maxlength="1000" placeholder="Коротко, почему это ошибка"></label>
+          <p class="err" id="f-err" role="alert"></p>
+          <button class="btn plain" type="submit">Добавить вывод</button>
+        </form>
+        <div class="glass pl-list"><div class="t">Мои выводы <span id="pl-n" class="label"></span></div><div id="pl-findings" class="pl-findings"></div>
+          <button class="btn" id="pl-submit">Отправить оценщику <span class="arr">→</span></button></div>
+      </div>
+    </div>
+    <div class="pl-result" id="pl-result" hidden></div>
+    <div class="glass pl-base">
+      <div class="t">Сравнить с базовыми политиками на этой же компании</div>
+      <div class="pl-base-btns"><button class="chip" data-p="simple_reconciler">Простая сверка</button><button class="chip" data-p="random_explorer">Случайный поиск</button><button class="chip" data-p="flag_all">«Пометить всё»</button><button class="chip" data-p="oracle">Oracle</button></div>
+      <div id="pl-base-out" class="pl-base-out"></div>
+    </div>
+  </div>
+</div></div></section>
+"""
+
 BOOK = """<div class="book-stage" aria-hidden="true"><div class="book-glow"></div><div class="book-float"><div class="book3">
       <div class="cover"></div><div class="block l"></div><div class="block r"></div>
       <div class="pg left" id="bpL"></div><div class="pg right" id="bpR"></div>
@@ -113,7 +167,7 @@ INDEX = f"""<section class="panel hero">
       <div class="hero-left" data-r style="--d:6">
         <h1 class="sr">Fin-Audit RL Gym — среда для обучения ИИ-аудиторов</h1>
         <p>Среда, в которой ИИ учится находить ошибки в финансовых книгах. Вымышленные компании, спрятанные расхождения и честная проверка каждого вывода.</p>
-        <a class="btn" href="books.html">Начать <span class="arr">→</span></a>
+        <a class="btn" href="play.html">Попробовать сейчас <span class="arr">→</span></a>
       </div>
       {BOOK}
       <div class="hero-right">
@@ -210,8 +264,13 @@ INDEX_SCRIPT = r"""<script>
 
 for f, num, name in PAGES:
     title = "Среда для ИИ-аудиторов" if f == "index.html" else name
-    body = INDEX if f == "index.html" else inner_page(f)
-    script = INDEX_SCRIPT if f == "index.html" else SCRIPT.get(f, "")
+    if f == "index.html":
+        body, script = INDEX, INDEX_SCRIPT
+    elif f == "play.html":
+        body = PLAY.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78))))
+        script = '<script src="assets/play.js"></script>'
+    else:
+        body, script = inner_page(f), SCRIPT.get(f, "")
     html = HEAD.format(title=title, slug=f[:-5], nav=nav(f), logo=LOGO) + body + next_panel(f) + FOOT.format(script=script)
     (ROOT / f).write_text(html, encoding="utf-8")
 print("built", len(PAGES), "pages")
