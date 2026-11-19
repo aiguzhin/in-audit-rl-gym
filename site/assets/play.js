@@ -100,7 +100,7 @@ def baseline(name):
       $$("#pl-work input, #pl-work select, #pl-work button").forEach(x => x.disabled = false);
       $("#pl-search").value = "";
       renderChips(); renderFindings(); inspect(null); setTab("ledger"); stage(2);
-      status(`Компания №${seed} готова: ${m.counts.ledger} проводок и ${m.counts.documents} документов. Нажмите на строку, чтобы открыть её в инспекторе.`);
+      status(`Компания №${seed} готова: ${m.counts.ledger} ${plural(m.counts.ledger,'проводка','проводки','проводок')} и ${m.counts.documents} ${plural(m.counts.documents,'документ','документа','документов')}. Нажмите на строку, чтобы открыть её в инспекторе.`);
       $("#pl-work").scrollIntoView({ behavior: UI.reduce ? "auto" : "smooth", block: "start" });
     }, 30);
   }
@@ -192,6 +192,7 @@ def baseline(name):
       : `<div class="kv"><span>Курс ${cur} на ${ruDate(date)}</span><button type="button" class="chip sm" data-fetch="${id}">Узнать · 1 шаг</button></div>`;
   }
   const addBtns = (id, what = "") => `<div class="add-row">${what ? `<span class="label">${what}</span>` : ""}<button type="button" class="chip sm" data-add="aff" data-id="${esc(id)}">+ затронутые</button><button type="button" class="chip sm" data-add="ev" data-id="${esc(id)}">+ доказательства</button></div>`;
+  function plural(n, a, b, c) { n = Math.abs(n) % 100; const d = n % 10; return n > 10 && n < 20 ? c : d === 1 ? a : d > 1 && d < 5 ? b : c; }
   const rowsHtml = rows => rows.length ? `<div class="mini-rows">${rows.map(x => `<button type="button" class="mr" data-open="${x.row_id}"><span>${esc(x.account)}<small>${esc(x.row_id)}</small></span><b class="${x.debit_minor ? "dr" : "cr"}">${x.debit_minor ? "Дт " + money(x.debit_minor, x.currency) : "Кт " + money(x.credit_minor, x.currency)}</b></button>`).join("")}</div>` : `<p class="empty">В загруженной части журнала проводок нет.</p>`;
   const ledgerNote = () => S.t.ledger && !S.t.ledger.next && !S.t.ledger.partial ? "" : `<p class="note">Журнал загружен не полностью — часть проводок может быть не видна. <button type="button" class="chip sm" data-loadall="ledger">Загрузить журнал</button></p>`;
   const periodBadge = d => inPeriod(d) ? `<span class="ok-b">в периоде</span>` : `<span class="bad-b">вне периода</span>`;
