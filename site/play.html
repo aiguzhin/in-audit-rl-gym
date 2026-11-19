@@ -28,48 +28,66 @@
   <div class="wrap page-head">
     <div class="crumbs"><span class="label"><span class="num">01</span> · Песочница</span><span class="label">Настоящая среда · Python в браузере</span></div>
     <h1 class="title">Проведите<br>аудит сами</h1>
-    <p class="intro" data-r style="--d:3">Здесь работает та же среда на Python, что и в проверке. Сгенерируйте компанию, найдите ошибки и отправьте выводы. Оценщик посчитает награду по тем же правилам, что и для ИИ.</p>
+    <p class="intro" data-r style="--d:3">Вы — аудитор. В книгах вымышленной компании спрятаны ошибки. Найдите их, опишите с доказательствами и получите честный балл от оценщика.</p>
   </div>
 </section>
 <section class="panel"><div class="content"><div class="wrap">
-  <div class="pl-bar glass" data-r>
+  <ol class="pl-steps" aria-label="Этапы аудита">
+    <li class="on"><span>1</span>Выберите компанию</li><li><span>2</span>Изучите книги</li><li><span>3</span>Опишите ошибки</li><li><span>4</span>Отправьте оценщику</li>
+  </ol>
+  <div class="pl-bar glass">
     <label class="fld"><span>Номер компании</span><input id="pl-seed" type="number" min="0" max="999999" value="2026"></label>
     <label class="fld"><span>Сценарий</span><select id="pl-preset">
-      <option value="mixed">Обычная компания</option><option value="inter">Взаимодействующие ошибки</option><option value="clean">Чистая компания</option><option value="single">Одна ошибка каждого типа</option></select></label>
+      <option value="single">Учебный: по одной ошибке каждого типа</option><option value="mixed" selected>Обычная компания</option><option value="inter">Сложный: ошибки переплетены</option><option value="clean">Проверка: чистая компания</option></select></label>
     <button class="btn" id="pl-gen" disabled>Сгенерировать <span class="arr">→</span></button>
     <button class="btn ghost" id="pl-daily" type="button" disabled><span class="dot"></span>Компания дня</button>
     <div class="pl-status" id="pl-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
   </div>
   <div id="pl-work" hidden>
-    <div class="pl-meta" id="pl-meta"></div>
+    <div class="pl-company" id="pl-company"></div>
     <div class="pl-grid">
       <div class="pl-books glass">
-        <div class="ex-bar"><button class="tab" data-t="ledger" aria-pressed="true">Журнал</button><button class="tab" data-t="invoices" aria-pressed="false">Счета</button><button class="tab" data-t="payments" aria-pressed="false">Платежи</button><button class="tab" data-t="fx" aria-pressed="false">Курсы</button>
-          <span class="steps-left" id="pl-steps"></span></div>
-        <div class="pl-hint">Нажмите на ID в таблице, чтобы добавить его в доказательства. С зажатым Shift ID попадёт в «затронутые». Каждая страница таблицы тратит один шаг из 100.</div>
+        <div class="ex-bar"><div id="pl-tabs" class="tabs"><button class="tab" data-t="ledger" aria-pressed="true">Журнал проводок</button><button class="tab" data-t="invoices" aria-pressed="false">Счета</button><button class="tab" data-t="payments" aria-pressed="false">Платежи</button><button class="tab" data-t="fx" aria-pressed="false">Курсы валют</button></div>
+          <label class="search"><span class="sr">Поиск по загруженным строкам</span><input id="pl-search" type="search" placeholder="Поиск: ID, счёт, сумма…" autocomplete="off"></label></div>
         <div class="tbl-wrap"><table class="grid" id="pl-tbl"></table></div>
-        <div class="pl-pager"><button class="chip" id="pl-more">Загрузить ещё 50 строк</button><span id="pl-count" class="label"></span></div>
+        <div class="pl-pager"><span id="pl-count" class="label"></span><span class="sp1"></span><button class="chip" id="pl-more">Ещё 50 строк · 1 шаг</button><button class="chip" id="pl-all">Загрузить всё</button></div>
       </div>
-      <div class="pl-side">
-        <form class="glass pl-form" id="pl-form">
+      <aside class="pl-side">
+        <div class="seg side-tabs" id="side-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-s="inspect">Инспектор</button><button type="button" role="tab" aria-selected="false" data-s="form">Вывод<span class="cnt" id="form-cnt" hidden></span></button><button type="button" role="tab" aria-selected="false" data-s="calc">Расчёты</button><button type="button" role="tab" aria-selected="false" data-s="help">Подсказки</button></div>
+        <div class="glass side-panel sp" id="sp-inspect"></div>
+        <div class="glass side-panel sp" id="sp-calc" hidden>
+          <div class="t">Калькулятор</div><p class="label">Считает здесь, шаги не тратит.</p>
+          <label class="fld"><span>Выражение</span><input id="calc-in" placeholder="например 48000 − 29500 × 2" autocomplete="off"></label><div class="calc-out" id="calc-out"></div>
+          <div class="t mt">Перевод в валюту учёта</div><p class="label">Курс берётся на выбранную дату. Если его нет среди загруженных, запрос стоит 1 шаг.</p>
+          <div class="cv"><label class="fld"><span>Сумма</span><input id="cv-amt" inputmode="decimal" placeholder="1250,50"></label><label class="fld"><span>Валюта</span><select id="cv-from"></select></label><label class="fld"><span>Дата</span><input id="cv-date" type="date"></label></div>
+          <button class="btn plain" id="cv-btn" type="button">Пересчитать</button><div class="calc-out" id="cv-out"></div>
+        </div>
+        <div class="glass side-panel sp help" id="sp-help" hidden>
+          <div class="t">Как искать ошибки</div>
+          <details open><summary>Дубль счёта</summary><ol><li>Откройте «Счета» и счёт в инспекторе.</li><li>Смотрите «Другие счета этого контрагента»: та же дата, те же позиции и сумма — подозрение на дубль.</li><li>Подписки с разными периодами услуг — это не дубль.</li></ol></details>
+          <details><summary>Неполное разнесение</summary><ol><li>Откройте платёж со ссылкой на счёт.</li><li>Инспектор сравнит «по документу» и «разнесено в 1200». Если есть разница, а остаток ушёл в 2900 — это ошибка.</li><li>Сумма вывода — неразнесённая часть в валюте платежа.</li></ol></details>
+          <details><summary>Неверный курс</summary><ol><li>Откройте валютный счёт или платёж.</li><li>Узнайте курс на его дату — инспектор посчитает правильную сумму.</li><li>Сравните со строкой журнала 1200 (счёт) или 1000 (платёж). Разница — сумма вывода.</li></ol></details>
+          <details><summary>Не тот период</summary><ol><li>В таблицах ищите метку «вне периода» — даты уже переведены в пояс компании.</li><li>Если такой документ всё равно проведён в журнале — это ошибка.</li><li>Документы следующего месяца без проводок — законны.</li></ol></details>
+        </div>
+        <div class="sp" id="sp-form" hidden><form class="glass pl-form side-panel" id="pl-form" novalidate>
           <div class="t">Новый вывод</div>
           <label class="fld"><span>Тип ошибки</span><select id="f-type"><option value="duplicate_invoice">Дубль счёта</option><option value="missing_or_partial_allocation">Неполное разнесение</option><option value="fx_conversion_error">Неверный курс</option><option value="period_cutoff_error">Не тот период</option></select></label>
-          <label class="fld"><span>Затронутые ID</span><input id="f-aff" placeholder="INV-…, PAY-…" autocomplete="off"></label>
-          <div class="two"><label class="fld"><span>Сумма, мин. ед.</span><input id="f-amt" type="number" min="0" placeholder="0"></label>
-          <label class="fld"><span>Валюта</span><select id="f-cur"></select></label></div>
-          <label class="fld"><span>Доказательства</span><input id="f-ev" placeholder="DOC-…, L-…, fx:…" autocomplete="off"></label>
-          <label class="fld"><span>Пояснение</span><input id="f-exp" maxlength="1000" placeholder="Коротко, почему это ошибка"></label>
+          <ul class="f-hint" id="f-hint"></ul>
+          <div class="fld"><span>Затронутые ID</span><div class="chips" id="f-aff-list"></div><input id="f-aff-in" placeholder="или впишите ID и нажмите Enter" autocomplete="off"></div>
+          <div class="two"><label class="fld"><span>Сумма</span><input id="f-amt" inputmode="decimal" placeholder="1250,50"></label><label class="fld"><span>Валюта</span><select id="f-cur"></select></label></div>
+          <div class="fld"><span>Доказательства</span><div class="chips" id="f-ev-list"></div><input id="f-ev-in" placeholder="или впишите ID и нажмите Enter" autocomplete="off"></div>
+          <label class="fld"><span>Пояснение (необязательно)</span><input id="f-exp" maxlength="1000" placeholder="Коротко, в чём ошибка"></label>
           <p class="err" id="f-err" role="alert"></p>
           <button class="btn plain" type="submit">Добавить вывод</button>
-        </form>
+        </form></div>
         <div class="glass pl-list"><div class="t">Мои выводы <span id="pl-n" class="label"></span></div><div id="pl-findings" class="pl-findings"></div>
-          <button class="btn" id="pl-submit">Отправить оценщику <span class="arr">→</span></button></div>
-      </div>
+          <button class="btn" id="pl-submit" type="button">Отправить оценщику <span class="arr">→</span></button></div>
+      </aside>
     </div>
     <div class="pl-result" id="pl-result" hidden></div>
     <div class="glass pl-base">
-      <div class="t">Сравнить с базовыми политиками на этой же компании</div>
-      <div class="pl-base-btns"><button class="chip" data-p="simple_reconciler">Простая сверка</button><button class="chip" data-p="random_explorer">Случайный поиск</button><button class="chip" data-p="flag_all">«Пометить всё»</button><button class="chip" data-p="oracle">Oracle</button></div>
+      <div class="t">Сравнить с программами на этой же компании</div>
+      <div class="pl-base-btns"><button class="chip" data-p="simple_reconciler">Простая сверка</button><button class="chip" data-p="random_explorer">Случайный поиск</button><button class="chip" data-p="flag_all">«Пометить всё»</button><button class="chip" data-p="oracle">Идеальный ответ</button></div>
       <div id="pl-base-out" class="pl-base-out"></div>
     </div>
   </div>
