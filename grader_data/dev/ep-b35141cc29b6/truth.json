@@ -1,0 +1,186 @@
+{
+  "episode_id": "ep-b35141cc29b6",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-1535E86C9F",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-D7JTK4",
+        "PAY-XJAG89"
+      ],
+      "expected_amount_minor": 42262362,
+      "currency": "KZT",
+      "tolerance_minor": 464,
+      "evidence_sets": [
+        [
+          "DOC-2ACNYMPF",
+          "DOC-CRZHS23M",
+          "L-5UVQR9C",
+          "L-BS784QX"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-E45B7D4139",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-XJAG89"
+      ],
+      "expected_amount_minor": 198444411,
+      "currency": "KZT",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-CRZHS23M",
+          "L-W2RUCJJ"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-7CE0743538",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-YYLTWD",
+        "PAY-QUJBTD"
+      ],
+      "expected_amount_minor": 42300985,
+      "currency": "KZT",
+      "tolerance_minor": 459,
+      "evidence_sets": [
+        [
+          "DOC-5FEZVE92",
+          "DOC-BM56WM4C",
+          "L-H5BV6MS",
+          "L-U7JNGDQ"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-45702BB70D",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "PAY-QUJBTD"
+      ],
+      "expected_amount_minor": 1197,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-5FEZVE92",
+          "L-ZRUDA77",
+          "fx:2026-02-28:KZT:EUR"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-EB1530BE81",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-SPURDL",
+        "PAY-SKUZXX"
+      ],
+      "expected_amount_minor": 19029876,
+      "currency": "KZT",
+      "tolerance_minor": 468,
+      "evidence_sets": [
+        [
+          "DOC-HR5HZG9L",
+          "DOC-UJL3RW6N",
+          "L-A7BSZS8",
+          "L-VUWDCTC"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-7926CDE184",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-62NDHB",
+        "PAY-24XR57"
+      ],
+      "expected_amount_minor": 157037179,
+      "currency": "KZT",
+      "tolerance_minor": 486,
+      "evidence_sets": [
+        [
+          "DOC-CF8NYGCZ",
+          "DOC-X3DSZDPY",
+          "L-997DPPY",
+          "L-XVXM3U3"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-04D06F569F",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-3JDCXY"
+      ],
+      "expected_amount_minor": 10400,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-6EBH7ZA5",
+          "L-EYZH54E",
+          "fx:2026-02-25:KZT:EUR"
+        ],
+        [
+          "DOC-6EBH7ZA5",
+          "L-VA6AL2Z",
+          "fx:2026-02-25:KZT:EUR"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-689138ADE9",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-PG3YCE"
+      ],
+      "expected_amount_minor": 241000,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-J5Z5TNCD",
+          "L-KD72E8A"
+        ],
+        [
+          "DOC-J5Z5TNCD",
+          "L-XRGGVUQ"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-415B51670E",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-GVWY8W"
+      ],
+      "expected_amount_minor": 298000,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-YUC95P9X",
+          "L-UJRNPJK"
+        ],
+        [
+          "DOC-YUC95P9X",
+          "L-KQWZLQB"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

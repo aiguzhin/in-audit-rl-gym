@@ -1,0 +1,50 @@
+{
+  "split": "train",
+  "note": "open training configs",
+  "groups": [
+    {
+      "name": "mixed",
+      "seeds": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006
+      ],
+      "config": {
+        "clean_probability": 0.2
+      }
+    },
+    {
+      "name": "clean",
+      "seeds": [
+        1007,
+        1008
+      ],
+      "config": {
+        "clean": true
+      }
+    },
+    {
+      "name": "interacting",
+      "seeds": [
+        1009,
+        1010
+      ],
+      "config": {
+        "clean": false,
+        "interactions": {
+          "partial_payment_wrong_fx": [
+            1,
+            1
+          ],
+          "cutoff_partial_payment_fx": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

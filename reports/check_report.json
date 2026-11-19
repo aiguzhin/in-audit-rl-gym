@@ -1,0 +1,83 @@
+{
+  "sections": {
+    "unit_tests": {
+      "ok": true,
+      "tail": [
+        "Ran 27 tests in 2.631s",
+        "",
+        "OK"
+      ]
+    },
+    "data_and_truth": {
+      "passed": 20,
+      "total": 20,
+      "failed": []
+    },
+    "baselines": {
+      "random_explorer": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.2,
+        "reward": -0.6077,
+        "inspection_steps": 22.85,
+        "wall_s": 0.01,
+        "episodes": 20
+      },
+      "simple_reconciler": {
+        "precision": 0.4825,
+        "recall": 0.2496,
+        "f1": 0.3684,
+        "reward": -0.2892,
+        "inspection_steps": 15.35,
+        "wall_s": 0.0166,
+        "episodes": 20
+      },
+      "flag_all": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "reward": -1.0,
+        "inspection_steps": 2,
+        "wall_s": 0.0052,
+        "episodes": 20
+      },
+      "oracle": {
+        "precision": 0.75,
+        "recall": 0.75,
+        "f1": 1.0,
+        "reward": 1.0,
+        "inspection_steps": 0,
+        "wall_s": 0.0006,
+        "episodes": 20
+      }
+    },
+    "baseline_sanity": {
+      "oracle_max_reward": true,
+      "flag_all_negative": true
+    },
+    "paired": {
+      "passed": 20,
+      "total": 20,
+      "failed": []
+    },
+    "failure_analysis_simple_reconciler": {
+      "missed_by_type": {
+        "fx_conversion_error": 22,
+        "missing_or_partial_allocation [cutoff_partial_payment_fx]": 13,
+        "fx_conversion_error [partial_payment_wrong_fx]": 10,
+        "missing_or_partial_allocation [partial_payment_wrong_fx]": 10,
+        "missing_or_partial_allocation": 9,
+        "period_cutoff_error [cutoff_partial_payment_fx]": 9,
+        "period_cutoff_error": 7,
+        "duplicate_invoice": 1
+      },
+      "false_positive_reasons": {
+        "affected_ids": 22,
+        "no_issues_in_truth": 4,
+        "type": 1
+      }
+    }
+  },
+  "ok": true,
+  "elapsed_s": 8.3
+}

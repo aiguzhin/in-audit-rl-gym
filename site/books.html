@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Книги — Fin-Audit RL Gym</title>
+<meta name="description" content="Воспроизводимая RL-среда для ИИ-аудитора: синтетические книги компании, скрытые ошибки, инструменты расследования и честная функция награды.">
+<link rel="preload" href="assets/fonts/unbounded-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23E0401E' stroke-width='3'/%3E%3Ctext x='16' y='21' font-size='13' text-anchor='middle' font-family='monospace' font-weight='700' fill='%23111110'%3EDr%3C/text%3E%3C/svg%3E">
+</head>
+<body data-page="books">
+<a class="skip" href="#main">К содержанию</a>
+<div class="progress"></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><i>Dr</i>Fin-Audit RL Gym</a>
+  <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="episode.html"><span>01</span>Эпизод</a><a href="books.html" class="on" aria-current="page"><span>02</span>Книги</a><a href="run.html"><span>03</span>Прогон</a><a href="reward.html"><span>04</span>Награда</a><a href="policies.html"><span>05</span>Политики</a><a href="start.html"><span>06</span>Запуск</a></nav>
+</div></header>
+<main id="main">
+<div class="wrap page-head">
+  <div class="crumbs"><span class="label"><span class="num">02</span> · Книги</span><span class="label">Fin-Audit RL Gym</span></div>
+  <h1 class="title">Открытые<br>книги</h1>
+  <p class="intro" data-r style="--d:3">Настоящий dev-эпизод с двумя сценариями взаимодействующих ошибок. Агент видит только эти таблицы. Включите режим оценщика и нажмите на ошибку: её доказательства подсветятся.</p>
+</div>
+<div class="wrap">
+  <div class="explorer" id="ex" data-r>
+    <div class="ex-main">
+      <div class="ex-bar" role="group" aria-label="Таблица">
+        <button class="tab" data-t="ledger" aria-pressed="true">Журнал</button>
+        <button class="tab" data-t="invoices" aria-pressed="false">Счета</button>
+        <button class="tab" data-t="payments" aria-pressed="false">Платежи</button>
+        <label class="switch"><input type="checkbox" id="gr"> Режим оценщика</label>
+      </div>
+      <div class="manifest" id="mf"></div>
+      <div class="legend"><span><i class="l-ev"></i>● строка-доказательство из эталона</span><span><i class="l-fo"></i>строки выбранной ошибки</span></div>
+      <div class="tbl-wrap"><table class="grid" id="tbl"></table></div>
+    </div>
+    <aside class="ex-side" aria-label="Эталон"><span class="label">Эталон · truth.json</span><div id="side" aria-live="polite"></div></aside>
+  </div>
+</div>
+<div class="wrap"><a class="next" href="run.html"><div><span class="label">Дальше · 03</span><div class="t">Прогон</div></div><span class="go">→</span></a></div></main>
+<footer class="bottom">
+  <div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди, счета и деньги вымышлены · MIT</span></div>
+  <div class="wrap"><div class="big-foot">Dr = Cr · Dr = Cr · Dr = Cr</div></div>
+</footer>
+<button class="totop" aria-label="Наверх">↑</button>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){ const {$, $$, esc, money, typeRu, evAll} = UI; const m = D.manifest;
+  $("#mf").innerHTML = `<span>эпизод <b>${m.episode_id}</b></span><span>период <b>${m.period_start} — ${m.period_end}</b></span><span>пояс <b>${m.timezone}</b></span><span>база <b>${m.base_currency}</b></span><span>проводок <b>${m.counts.ledger}</b></span><span>документов <b>${m.counts.documents}</b></span>`;
+  let tab = "ledger", focus = null;
+  const cols = {
+    ledger: [["row_id","row_id"],["timestamp","время"],["account","счёт"],["debit_minor","дебет, мин.",1],["credit_minor","кредит, мин.",1],["invoice_id","invoice_id"],["payment_id","payment_id"]],
+    invoices: [["doc_id","doc_id"],["invoice_id","invoice_id"],["issued_at","issued_at"],["currency","вал."],["total_minor","сумма, мин.",1],["entity_id","контрагент"]],
+    payments: [["doc_id","doc_id"],["payment_id","payment_id"],["timestamp","время (UTC)"],["currency","вал."],["amount_minor","сумма, мин.",1],["invoice_refs","invoice_refs"]]};
+  function cell(r, k, num){ const v = r[k];
+    if (v === null || v === undefined) return `<td class="null">null</td>`;
+    if (k === "invoice_refs") return `<td>${v.length ? v.map(x => esc(x.invoice_id) + " · " + x.amount_minor).join(", ") : '<span class="null">[]</span>'}</td>`;
+    if (num) return `<td class="num">${v === 0 ? '<span class="null">0</span>' : Number(v).toLocaleString("ru-RU")}</td>`;
+    return `<td>${esc(v)}</td>`; }
+  function renderTable(){ const rows = D[tab], c = cols[tab];
+    const fs = focus ? new Set(focus.evidence_sets.flat().concat(focus.affected_ids)) : null;
+    $("#tbl").innerHTML = `<thead><tr>${c.map(x => `<th>${x[1]}</th>`).join("")}</tr></thead><tbody>` + rows.map((r, n) => {
+      const k = r.row_id || r.doc_id; const ev = evAll.has(k) ? "ev" : "";
+      const fo = fs && (fs.has(k) || (tab !== "ledger" && (fs.has(r.invoice_id) || fs.has(r.payment_id)))) ? " focus" : "";
+      const cells = c.map(x => cell(r, x[0], x[2])); if (ev && $("#gr").checked) cells[0] = cells[0].replace("<td>", '<td><span class="evmark" aria-hidden="true">●</span><span class="sr">Доказательство: </span>');
+      return `<tr class="${ev}${fo}" style="--k:${Math.min(n, 30)}">${cells.join("")}</tr>`; }).join("") + "</tbody>"; }
+  function renderSide(){
+    if (!$("#gr").checked){ $("#side").innerHTML = `<div class="locked"><b>Эталон закрыт</b>В закрытом прогоне агент его не видит: ни в наблюдениях, ни в путях, ни в ошибках. Включите режим оценщика, чтобы посмотреть, что спрятано в этих книгах.</div>`; return; }
+    $("#side").innerHTML = `<div class="issues">` + D.truth.map((i, n) => `<button class="issue${focus === i ? " on" : ""}" data-n="${n}" style="--k:${n}">
+      <div class="k">${typeRu[i.type]}</div><div class="s">${i.scenario ? "сценарий: " + i.scenario : "одиночная ошибка"} · ${i.affected_ids.join(", ")}</div>
+      <div class="a">${money(i.expected_amount_minor, i.currency)}${i.tolerance_minor ? ` <span class="null">± ${i.tolerance_minor}</span>` : ""}</div></button>`).join("") + `</div>`;
+    $$(".issue").forEach(b => b.onclick = () => { const i = D.truth[+b.dataset.n]; focus = focus === i ? null : i; renderSide(); renderTable();
+      const f = $("tr.focus"); if (f) { const w = $(".tbl-wrap"); w.scrollTo({top: f.offsetTop - w.clientHeight / 3, behavior: "smooth"}); } }); }
+  $$(".tab").forEach(b => b.onclick = () => { $$(".tab").forEach(x => x.setAttribute("aria-pressed", x === b)); tab = b.dataset.t; renderTable(); });
+  $("#gr").onchange = () => { $("#ex").classList.toggle("grader", $("#gr").checked); if (!$("#gr").checked) focus = null; renderSide(); renderTable(); };
+  renderTable(); renderSide();
+})();
+</script>
+</body>
+</html>

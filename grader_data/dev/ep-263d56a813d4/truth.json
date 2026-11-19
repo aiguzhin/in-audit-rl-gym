@@ -1,0 +1,121 @@
+{
+  "episode_id": "ep-263d56a813d4",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-D515284559",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-WBYGCV",
+        "PAY-W42TBN"
+      ],
+      "expected_amount_minor": 303272,
+      "currency": "USD",
+      "tolerance_minor": 3,
+      "evidence_sets": [
+        [
+          "DOC-JBTEH3DC",
+          "DOC-Y3NS3BQQ",
+          "L-LT6YRWP",
+          "L-XEGZ8AT"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-C9857C7BF9",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-W42TBN"
+      ],
+      "expected_amount_minor": 456773,
+      "currency": "USD",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-JBTEH3DC",
+          "L-5HUS9KA"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-7118D38927",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-XLWUCS",
+        "PAY-UZPQGH"
+      ],
+      "expected_amount_minor": 149786,
+      "currency": "GBP",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-J2939QG6",
+          "DOC-QSYW3RKS",
+          "L-B36Y4WR",
+          "L-YDVR3NA"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-D17914D763",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-YZMMDC"
+      ],
+      "expected_amount_minor": 426000,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-MEL7WQ25",
+          "L-3D5RHGV"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-2172F68DF8",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-5G82NR"
+      ],
+      "expected_amount_minor": 418000,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-25DM3N2R",
+          "L-ZPEH7T2"
+        ],
+        [
+          "DOC-25DM3N2R",
+          "L-ASGRDSE"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-0FA9B9C962",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-YNTWBJ",
+        "PAY-CR8J5U"
+      ],
+      "expected_amount_minor": 382476,
+      "currency": "GBP",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-29LCA7RF",
+          "DOC-G7LVCNWX",
+          "L-2EALEES",
+          "L-K2FJE8A"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

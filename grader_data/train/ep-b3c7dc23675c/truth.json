@@ -1,0 +1,97 @@
+{
+  "episode_id": "ep-b3c7dc23675c",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-876B23C984",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-4K76VJ"
+      ],
+      "expected_amount_minor": 492000,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-XUJ2AFB6",
+          "L-T7VY6YR"
+        ],
+        [
+          "DOC-XUJ2AFB6",
+          "L-UNMVBFP"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-821B05F39D",
+      "type": "duplicate_invoice",
+      "affected_ids": [
+        "INV-2E4LDX",
+        "INV-JJFWNM"
+      ],
+      "expected_amount_minor": 272100,
+      "currency": "USD",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-J4RANHSS",
+          "DOC-UJ57A7ZM",
+          "L-FNLV2E9"
+        ],
+        [
+          "DOC-J4RANHSS",
+          "DOC-UJ57A7ZM",
+          "L-Z2P85VS"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-C8F4AA8728",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-6QDPFD"
+      ],
+      "expected_amount_minor": 4770,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-W3SJS7BK",
+          "L-2WBKG9C",
+          "fx:2025-12-24:USD:EUR"
+        ],
+        [
+          "DOC-W3SJS7BK",
+          "L-JHPM8A8",
+          "fx:2025-12-24:USD:EUR"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-5B86BB8ABF",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-SDALQD"
+      ],
+      "expected_amount_minor": 1209,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-T5L8PJXY",
+          "L-J6M4Y6C",
+          "fx:2025-12-14:USD:EUR"
+        ],
+        [
+          "DOC-T5L8PJXY",
+          "L-8XEXFHC",
+          "fx:2025-12-14:USD:EUR"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

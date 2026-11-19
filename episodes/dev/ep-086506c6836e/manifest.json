@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "generator_version": "1.0.0",
+  "episode_id": "ep-086506c6836e",
+  "base_currency": "KZT",
+  "currencies": [
+    "CNY",
+    "KWD",
+    "KZT"
+  ],
+  "currency_exponents": {
+    "CNY": 2,
+    "KWD": 3,
+    "KZT": 2
+  },
+  "period_start": "2026-08-01",
+  "period_end": "2026-08-31",
+  "period_bounds_local": [
+    "2026-08-01T00:00:00-05:00",
+    "2026-09-01T00:00:00-05:00"
+  ],
+  "timezone": "-05:00",
+  "counts": {
+    "ledger": 593,
+    "invoices": 58,
+    "payments": 42,
+    "fx": 166,
+    "documents": 100
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor"
+  }
+}

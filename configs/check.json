@@ -1,0 +1,91 @@
+{
+  "split": "check",
+  "note": "Структура закрытой проверки (20 эпизодов: 5 чистых, 5 с взаимодействующими ошибками, 10 обычных). Организаторы подставляют свои секретные seed и secret_salt.",
+  "groups": [
+    {
+      "name": "clean",
+      "seeds": [
+        9101,
+        9102,
+        9103,
+        9104,
+        9105
+      ],
+      "config": {
+        "clean": true,
+        "secret_salt": "public-example"
+      }
+    },
+    {
+      "name": "interacting",
+      "seeds": [
+        9201,
+        9202,
+        9203,
+        9204,
+        9205
+      ],
+      "config": {
+        "clean": false,
+        "secret_salt": "public-example",
+        "interactions": {
+          "partial_payment_wrong_fx": [
+            1,
+            1
+          ],
+          "cutoff_partial_payment_fx": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "name": "regular",
+      "seeds": [
+        9301,
+        9302,
+        9303,
+        9304,
+        9305,
+        9306,
+        9307,
+        9308,
+        9309,
+        9310
+      ],
+      "config": {
+        "clean": false,
+        "secret_salt": "public-example",
+        "size": {
+          "period_invoices": [
+            30,
+            110
+          ],
+          "expenses": [
+            80,
+            350
+          ]
+        },
+        "errors": {
+          "duplicate_invoice": [
+            0,
+            3
+          ],
+          "missing_or_partial_allocation": [
+            0,
+            3
+          ],
+          "fx_conversion_error": [
+            0,
+            3
+          ],
+          "period_cutoff_error": [
+            0,
+            3
+          ]
+        }
+      }
+    }
+  ]
+}

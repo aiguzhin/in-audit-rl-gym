@@ -1,0 +1,86 @@
+{
+  "policy_version": "1.0",
+  "base_currency": "USD",
+  "timezone": "-03:00",
+  "period": {
+    "rule": "A document belongs to the period iff its LOCAL calendar date (timestamp converted to manifest.timezone) is within [period_start, period_end] inclusive. Timestamps may be written with any offset (e.g. +00:00); always convert first.",
+    "invoice_date_field": "issued_at",
+    "payment_date_field": "timestamp",
+    "opening_balances": "Invoices issued before the period appear as 1200/3000 opening rows dated period_start."
+  },
+  "fx": {
+    "rate_meaning": "fx.csv rate = units of target_currency per 1 unit of source_currency",
+    "rate_date": "local calendar date of the document (issued_at for invoices, timestamp for payments)",
+    "ar_clearing_rate": "receipts credit 1200 at the rate of the INVOICE date (historical rate); the difference to cash goes to 7000 FX gain/loss",
+    "conversion": "base_minor = round_half_up(amount_minor / 10^exp_src * rate * 10^exp_base)",
+    "fx_id": "fx:<date>:<source_currency>:<target_currency>"
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor unit of target currency"
+  },
+  "accounts": {
+    "1000 Cash": "bank",
+    "1200 Accounts receivable": "receivables (per invoice_id)",
+    "2100 Customer advances": "customer overpayments / refunds",
+    "2900 Suspense - unapplied cash": "receipts not applied to an invoice",
+    "3000 Opening balance equity": "opening balances",
+    "4000 Revenue": "revenue",
+    "7000 FX gain/loss": "realised FX difference",
+    "6xxx": "expenses (vendors)"
+  },
+  "posting_rules": [
+    "invoice: Dr 1200 / Cr 4000 at invoice-date rate, timestamp = issued_at (local)",
+    "receipt: Dr 1000 (amount at payment-date rate); Cr 1200 per invoice_ref at invoice-date rate; excess over refs -> Cr 2100; amount not applied -> Cr 2900; balancing -> 7000",
+    "receipt with empty invoice_refs (unidentified payer) -> Cr 2900 (legitimate)",
+    "refund (negative amount_minor): Dr 2100 / Cr 1000 (legitimate)",
+    "split payments, multi-invoice payments, partial payments and recurring identical amounts are legitimate",
+    "documents dated in the next period must not be posted"
+  ],
+  "issue_types": {
+    "duplicate_invoice": {
+      "meaning": "The same invoice (same entity, currency, local issue date and identical line_items) is posted twice.",
+      "affected_ids": "both invoice_id values (original and duplicate)",
+      "amount": "total_minor of the duplicate invoice",
+      "currency": "invoice currency",
+      "tolerance_minor": 0
+    },
+    "missing_or_partial_allocation": {
+      "meaning": "A payment's invoice_refs allocate an amount to an invoice, but the ledger credits less (or nothing) to 1200 for that payment+invoice; the rest sits in 2900 suspense.",
+      "affected_ids": "[payment_id, invoice_id]",
+      "amount": "unapplied part, in payment currency minor units",
+      "currency": "payment currency",
+      "tolerance_minor": "conversion resolution: ceil(10^(exp_src-exp_base)/rate)+1 (0 for base currency)"
+    },
+    "fx_conversion_error": {
+      "meaning": "A foreign-currency document is posted with a rate other than the policy rate.",
+      "affected_ids": "[invoice_id] (1200/4000 posting) or [payment_id] (1000 cash posting)",
+      "amount": "|booked base amount - correct base amount| of the 1200 debit (invoice) or 1000 debit (payment)",
+      "currency": "base currency",
+      "tolerance_minor": 1
+    },
+    "period_cutoff_error": {
+      "meaning": "A document whose local date is outside the period is posted in this period.",
+      "affected_ids": "[invoice_id] or [payment_id]",
+      "amount": "invoice total_minor or payment amount_minor",
+      "currency": "document currency",
+      "tolerance_minor": 0
+    }
+  },
+  "evidence": {
+    "ids": "doc_id (invoice_id/payment_id also accepted), ledger row_id, fx_id",
+    "rule": "a finding is supported if its evidence_ids contain at least one complete accepted evidence set",
+    "typical_sets": {
+      "duplicate_invoice": "both invoice docs + a ledger row (1200 or 4000) of the duplicate",
+      "missing_or_partial_allocation": "payment doc + its 2900 suspense row; if partly applied, also the invoice doc and the 1200 credit row of that payment+invoice",
+      "fx_conversion_error": "document + its 1200/4000 row (invoice) or 1000 row (payment) + fx_id of the correct date",
+      "period_cutoff_error": "document + its 1200/4000 row (invoice) or 1000 row (payment)"
+    }
+  },
+  "submission": {
+    "max_findings": 30,
+    "max_evidence_ids": 10,
+    "max_explanation_chars": 1000,
+    "schema": "{episode_id, findings:[{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "generator_version": "1.0.0",
+  "episode_id": "ep-e36dbb3f39fb",
+  "base_currency": "GBP",
+  "currencies": [
+    "EUR",
+    "GBP"
+  ],
+  "currency_exponents": {
+    "EUR": 2,
+    "GBP": 2
+  },
+  "period_start": "2025-01-01",
+  "period_end": "2025-01-31",
+  "period_bounds_local": [
+    "2025-01-01T00:00:00+00:00",
+    "2025-02-01T00:00:00+00:00"
+  ],
+  "timezone": "+00:00",
+  "counts": {
+    "ledger": 515,
+    "invoices": 51,
+    "payments": 29,
+    "fx": 83,
+    "documents": 80
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor"
+  }
+}

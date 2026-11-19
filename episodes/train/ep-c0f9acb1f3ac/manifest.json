@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "generator_version": "1.0.0",
+  "episode_id": "ep-c0f9acb1f3ac",
+  "base_currency": "EUR",
+  "currencies": [
+    "EUR",
+    "GBP",
+    "JPY",
+    "KZT"
+  ],
+  "currency_exponents": {
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2
+  },
+  "period_start": "2026-02-01",
+  "period_end": "2026-02-28",
+  "period_bounds_local": [
+    "2026-02-01T00:00:00+09:00",
+    "2026-03-01T00:00:00+09:00"
+  ],
+  "timezone": "+09:00",
+  "counts": {
+    "ledger": 452,
+    "invoices": 64,
+    "payments": 46,
+    "fx": 240,
+    "documents": 110
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor"
+  }
+}

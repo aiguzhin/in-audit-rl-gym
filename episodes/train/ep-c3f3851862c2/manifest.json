@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "generator_version": "1.0.0",
+  "episode_id": "ep-c3f3851862c2",
+  "base_currency": "GBP",
+  "currencies": [
+    "CNY",
+    "EUR",
+    "GBP",
+    "KWD"
+  ],
+  "currency_exponents": {
+    "CNY": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "KWD": 3
+  },
+  "period_start": "2025-09-01",
+  "period_end": "2025-09-30",
+  "period_bounds_local": [
+    "2025-09-01T00:00:00+09:00",
+    "2025-10-01T00:00:00+09:00"
+  ],
+  "timezone": "+09:00",
+  "counts": {
+    "ledger": 452,
+    "invoices": 50,
+    "payments": 39,
+    "fx": 246,
+    "documents": 89
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor"
+  }
+}

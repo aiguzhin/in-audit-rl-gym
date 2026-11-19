@@ -1,0 +1,64 @@
+{
+  "split": "dev",
+  "note": "open dev configs: other seeds, larger books, other timezone mix",
+  "groups": [
+    {
+      "name": "mixed-large",
+      "seeds": [
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006
+      ],
+      "config": {
+        "size": {
+          "period_invoices": [
+            60,
+            120
+          ],
+          "expenses": [
+            150,
+            400
+          ]
+        },
+        "timezones": [
+          "+05:00",
+          "-05:00",
+          "+09:00"
+        ]
+      }
+    },
+    {
+      "name": "clean",
+      "seeds": [
+        2007,
+        2008
+      ],
+      "config": {
+        "clean": true
+      }
+    },
+    {
+      "name": "interacting",
+      "seeds": [
+        2009,
+        2010
+      ],
+      "config": {
+        "clean": false,
+        "interactions": {
+          "partial_payment_wrong_fx": [
+            1,
+            1
+          ],
+          "cutoff_partial_payment_fx": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

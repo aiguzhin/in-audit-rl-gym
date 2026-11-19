@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Запуск — Fin-Audit RL Gym</title>
+<meta name="description" content="Воспроизводимая RL-среда для ИИ-аудитора: синтетические книги компании, скрытые ошибки, инструменты расследования и честная функция награды.">
+<link rel="preload" href="assets/fonts/unbounded-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23E0401E' stroke-width='3'/%3E%3Ctext x='16' y='21' font-size='13' text-anchor='middle' font-family='monospace' font-weight='700' fill='%23111110'%3EDr%3C/text%3E%3C/svg%3E">
+</head>
+<body data-page="start">
+<a class="skip" href="#main">К содержанию</a>
+<div class="progress"></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><i>Dr</i>Fin-Audit RL Gym</a>
+  <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="episode.html"><span>01</span>Эпизод</a><a href="books.html"><span>02</span>Книги</a><a href="run.html"><span>03</span>Прогон</a><a href="reward.html"><span>04</span>Награда</a><a href="policies.html"><span>05</span>Политики</a><a href="start.html" class="on" aria-current="page"><span>06</span>Запуск</a></nav>
+</div></header>
+<main id="main">
+<div class="wrap page-head">
+  <div class="crumbs"><span class="label"><span class="num">06</span> · Запуск</span><span class="label">Fin-Audit RL Gym</span></div>
+  <h1 class="title">Одна<br>команда</h1>
+  <p class="intro" data-r style="--d:3">Тесты, проверка данных и эталона, базовые политики, парные проверки и разбор сбоев запускаются одной командой. Без сети, платных API и GPU.</p>
+</div>
+<div class="wrap run">
+  <pre class="code" data-r><button class="copy" id="cp">Копировать команду</button><span class="c"># локально, Python 3.11, зависимостей нет</span>
+<span class="p">$ </span>python -m auditenv check
+
+<span class="c"># в контейнере, без сети</span>
+<span class="p">$ </span>docker build -t fin-audit-rl .
+<span class="p">$ </span>docker run --rm --network none fin-audit-rl
+
+<span class="c"># 10 train + 10 dev эпизодов и траектории</span>
+<span class="p">$ </span>python -m auditenv export
+
+<span class="c"># показ эпизода со скриптовой политикой</span>
+<span class="p">$ </span>python -m auditenv demo</pre>
+  <div class="files" data-r style="--d:1">
+    <div><b>auditenv/generator.py</b><span>история → проводки → ошибки → отрисовка</span></div>
+    <div><b>auditenv/env.py</b><span>reset / step, 100 шагов, 60 секунд</span></div>
+    <div><b>auditenv/matcher.py</b><span>нормализация, допуски, паросочетание, награда</span></div>
+    <div><b>auditenv/reference.py</b><span>независимая сверка по открытым записям</span></div>
+    <div><b>auditenv/server.py</b><span>изолированный процесс оценщика</span></div>
+    <div><b>auditenv/policies.py</b><span>четыре адаптера базовых политик</span></div>
+    <div><b>tests/test_all.py</b><span>27 тестов среды, matcher и награды</span></div>
+    <div><b>episodes/ · trajectories/</b><span>открытые эпизоды и траектории</span></div>
+  </div>
+</div>
+<div class="wrap">
+  <h2 class="h2" data-r>Честные ограничения</h2>
+  <div class="limits">
+    <div data-r><b>Упрощённая модель</b>Только дебиторская задолженность, один период, книги в базовой валюте.</div>
+    <div data-r style="--d:1"><b>Не реальный аудит</b>Высокая награда не доказывает пригодность для реального аудита.</div>
+    <div data-r><b>Открытый генератор</b>Закрытая проверка обязана использовать секретные seed и соль, иначе seed можно перебрать.</div>
+    <div data-r style="--d:1"><b>Без обучения весов</b>Модель не обучалась, улучшение модели не заявляется.</div>
+  </div>
+</div>
+<div class="wrap"><a class="next" href="episode.html"><div><span class="label">Сначала · 01</span><div class="t">Эпизод</div></div><span class="go">→</span></a></div></main>
+<footer class="bottom">
+  <div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди, счета и деньги вымышлены · MIT</span></div>
+  <div class="wrap"><div class="big-foot">Dr = Cr · Dr = Cr · Dr = Cr</div></div>
+</footer>
+<button class="totop" aria-label="Наверх">↑</button>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(function(){ const {$} = UI;
+  $("#cp").onclick = async () => { try { await navigator.clipboard.writeText("python -m auditenv check"); $("#cp").textContent = "Скопировано"; }
+    catch (e) { $("#cp").textContent = "Не удалось"; } setTimeout(() => $("#cp").textContent = "Копировать команду", 1600); };
+})();
+</script>
+</body>
+</html>

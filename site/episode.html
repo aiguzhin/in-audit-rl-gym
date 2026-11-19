@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Эпизод — Fin-Audit RL Gym</title>
+<meta name="description" content="Воспроизводимая RL-среда для ИИ-аудитора: синтетические книги компании, скрытые ошибки, инструменты расследования и честная функция награды.">
+<link rel="preload" href="assets/fonts/unbounded-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23E0401E' stroke-width='3'/%3E%3Ctext x='16' y='21' font-size='13' text-anchor='middle' font-family='monospace' font-weight='700' fill='%23111110'%3EDr%3C/text%3E%3C/svg%3E">
+</head>
+<body data-page="episode">
+<a class="skip" href="#main">К содержанию</a>
+<div class="progress"></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><i>Dr</i>Fin-Audit RL Gym</a>
+  <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="episode.html" class="on" aria-current="page"><span>01</span>Эпизод</a><a href="books.html"><span>02</span>Книги</a><a href="run.html"><span>03</span>Прогон</a><a href="reward.html"><span>04</span>Награда</a><a href="policies.html"><span>05</span>Политики</a><a href="start.html"><span>06</span>Запуск</a></nav>
+</div></header>
+<main id="main">
+<div class="wrap page-head">
+  <div class="crumbs"><span class="label"><span class="num">01</span> · Эпизод</span><span class="label">Fin-Audit RL Gym</span></div>
+  <h1 class="title">Как рождается<br>эпизод</h1>
+  <p class="intro" data-r style="--d:3">Сначала строится согласованная скрытая история компании, и только потом в неё вносятся ошибки. Поэтому эталон описывает реальное расхождение, а не случайную подозрительную строку.</p>
+</div>
+<div class="wrap">
+  <div class="steps4">
+    <div class="step4" data-r style="--d:0"><div class="i">01</div><h3>Скрытая история</h3><p>Клиенты, подписки, поставщики, счета прошлого, текущего и следующего месяца, платежи и курсы. Всё выводится из seed.</p></div>
+    <div class="step4" data-r style="--d:1"><div class="i">02</div><h3>Чистые проводки</h3><p>Проводки по правилам policy.json. Равенство Dr = Cr проверяется по каждому счёту и платежу ещё до ошибок.</p></div>
+    <div class="step4" data-r style="--d:2"><div class="i">03</div><h3>Ошибки с причиной</h3><p>Изменение строк записывается в provenance. Эталон получает тип, ID, сумму, допуск и наборы доказательств.</p></div>
+    <div class="step4" data-r style="--d:3"><div class="i">04</div><h3>Отрисовка</h3><p>Публичные ID и порядок зависят только от «соли». Смена ID и перестановка не меняют компанию и ответ.</p></div>
+  </div>
+  <h2 class="h2" data-r>Четыре типа ошибок</h2>
+  <div class="types">
+    <div class="type" data-r style="--d:0"><code>duplicate_invoice</code><h3>Дубль счёта</h3><p>Тот же счёт введён и проведён дважды в один день: те же строки, тот же заказ.</p><p class="trap"><b>Ловушка:</b> еженедельные подписки с одинаковой суммой — это не дубли.</p></div>
+    <div class="type" data-r style="--d:1"><code>missing_or_partial_allocation</code><h3>Неполное разнесение</h3><p>Платёж ссылается на счёт, но в 1200 ушло меньше, а остаток лёг в 2900.</p><p class="trap"><b>Ловушка:</b> нераспознанные поступления в 2900 законны.</p></div>
+    <div class="type" data-r style="--d:0"><code>fx_conversion_error</code><h3>Неверный курс</h3><p>Курс чужой даты или переставленные цифры в курсе при пересчёте в базовую валюту.</p><p class="trap"><b>Ловушка:</b> курсовая разница 7000 при оплате — это норма.</p></div>
+    <div class="type" data-r style="--d:1"><code>period_cutoff_error</code><h3>Не тот период</h3><p>Документ следующего месяца проведён в текущем.</p><p class="trap"><b>Ловушка:</b> время в UTC выглядит как текущий период, хотя по поясу компании это уже следующий.</p></div>
+  </div>
+  <h2 class="h2" data-r>Взаимодействующие сценарии</h2>
+  <div class="types">
+    <div class="type" data-r><code>partial_payment_wrong_fx</code><h3>Частичная оплата по неверному курсу</h3><p>Валютный платёж разнесён не полностью и проведён по курсу чужой даты. В эталоне две ошибки, и одна мешает увидеть другую.</p></div>
+    <div class="type" data-r style="--d:1"><code>cutoff_partial_payment_fx</code><h3>Частичный платёж на границе</h3><p>Валютный платёж первых часов следующего месяца проведён рано и разнесён не до конца.</p></div>
+  </div>
+</div>
+<div class="wrap"><a class="next" href="books.html"><div><span class="label">Дальше · 02</span><div class="t">Книги</div></div><span class="go">→</span></a></div></main>
+<footer class="bottom">
+  <div class="wrap"><span>Fin-Audit RL Gym · кейс 01 FinTech · 2026</span><span>Все компании, люди, счета и деньги вымышлены · MIT</span></div>
+  <div class="wrap"><div class="big-foot">Dr = Cr · Dr = Cr · Dr = Cr</div></div>
+</footer>
+<button class="totop" aria-label="Наверх">↑</button>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+
+</body>
+</html>

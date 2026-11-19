@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: fin-audit-rl-gym
+    runtime: static
+    buildCommand: echo "static site"
+    staticPublishPath: ./site
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,0 +1,115 @@
+{
+  "episode_id": "ep-5daadf3a13f5",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-85DDF678CC",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-A9673K"
+      ],
+      "expected_amount_minor": 1040775,
+      "currency": "KZT",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-5NET5VYH",
+          "L-Z9NTWKR",
+          "fx:2025-08-08:JPY:KZT"
+        ],
+        [
+          "DOC-5NET5VYH",
+          "L-QVU9M36",
+          "fx:2025-08-08:JPY:KZT"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-6FD000965A",
+      "type": "duplicate_invoice",
+      "affected_ids": [
+        "INV-B9NXB8",
+        "INV-S6P4ZC"
+      ],
+      "expected_amount_minor": 30630000,
+      "currency": "KZT",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-DD4W944Q",
+          "DOC-KP8HSA8G",
+          "L-TVUQF2D"
+        ],
+        [
+          "DOC-DD4W944Q",
+          "DOC-KP8HSA8G",
+          "L-JJJ9FZK"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-58636F5754",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-YZYPK6"
+      ],
+      "expected_amount_minor": 61800,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-VNFJUS39",
+          "L-LWSQ7YM"
+        ],
+        [
+          "DOC-VNFJUS39",
+          "L-6VDAE6S"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-F0B75FD71F",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-2LGRDC"
+      ],
+      "expected_amount_minor": 496120000,
+      "currency": "KZT",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-V8JSRA4W",
+          "L-P47QDXC"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-FFB66FA51C",
+      "type": "duplicate_invoice",
+      "affected_ids": [
+        "INV-L9PUZF",
+        "INV-VWH6TV"
+      ],
+      "expected_amount_minor": 357740000,
+      "currency": "KZT",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-A9FS8S2R",
+          "DOC-XCZFMZAR",
+          "L-B9BM83K"
+        ],
+        [
+          "DOC-A9FS8S2R",
+          "DOC-XCZFMZAR",
+          "L-H4HUSNF"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

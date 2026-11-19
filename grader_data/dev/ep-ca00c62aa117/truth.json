@@ -1,0 +1,185 @@
+{
+  "episode_id": "ep-ca00c62aa117",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-E11DB00DA5",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-HZWT3S",
+        "PAY-BUNWCU"
+      ],
+      "expected_amount_minor": 2046007,
+      "currency": "CNY",
+      "tolerance_minor": 2,
+      "evidence_sets": [
+        [
+          "DOC-FJBGZTS2",
+          "DOC-PG3C2Y46",
+          "L-39WGCK5",
+          "L-YYSPWVZ"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-6649CDECAD",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "PAY-BUNWCU"
+      ],
+      "expected_amount_minor": 6032615,
+      "currency": "KZT",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-PG3C2Y46",
+          "L-EHP5CVR",
+          "fx:2025-12-26:CNY:KZT"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-C1063A02C5",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-DW33SN",
+        "PAY-69MHMU"
+      ],
+      "expected_amount_minor": 316395,
+      "currency": "CNY",
+      "tolerance_minor": 2,
+      "evidence_sets": [
+        [
+          "DOC-98RXN5MP",
+          "DOC-EJVC4QC3",
+          "L-4RAVNSJ",
+          "L-6MDFBFR"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-EB25A6F45F",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-69MHMU"
+      ],
+      "expected_amount_minor": 886075,
+      "currency": "CNY",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-EJVC4QC3",
+          "L-2A83DVH"
+        ]
+      ],
+      "scenario": "cutoff_partial_payment_fx"
+    },
+    {
+      "issue_id": "ISS-C52D76588D",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-T2QLUB",
+        "PAY-Y4VM75"
+      ],
+      "expected_amount_minor": 2603020,
+      "currency": "CNY",
+      "tolerance_minor": 2,
+      "evidence_sets": [
+        [
+          "DOC-CPA2VNRB",
+          "DOC-FFK9465V",
+          "L-45VYYA9",
+          "L-H72DJET"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-21356841FF",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-JDZ6VE",
+        "PAY-GEAYVZ"
+      ],
+      "expected_amount_minor": 144518,
+      "currency": "USD",
+      "tolerance_minor": 2,
+      "evidence_sets": [
+        [
+          "DOC-8EKT9KG6",
+          "L-BWFM75K"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-15A70D6FF1",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-ULYL7M"
+      ],
+      "expected_amount_minor": 1233000,
+      "currency": "CNY",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-LHUDPR7W",
+          "L-3GGZHJT"
+        ],
+        [
+          "DOC-LHUDPR7W",
+          "L-DWHHKKW"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-D7C4C95B63",
+      "type": "duplicate_invoice",
+      "affected_ids": [
+        "INV-AWWRBN",
+        "INV-R22PZ3"
+      ],
+      "expected_amount_minor": 3634000,
+      "currency": "CNY",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-QHDQCPF3",
+          "DOC-U2S8KQ3W",
+          "L-HVBE7DU"
+        ],
+        [
+          "DOC-QHDQCPF3",
+          "DOC-U2S8KQ3W",
+          "L-HRJTDQM"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-4F2491645A",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "INV-CAHDN4"
+      ],
+      "expected_amount_minor": 4847000,
+      "currency": "CNY",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-89ZBJHLL",
+          "L-LNJTRH9"
+        ],
+        [
+          "DOC-89ZBJHLL",
+          "L-KD8JLM6"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "episode_id": "ep-269d527543e1",
+  "clean": false,
+  "issues": [
+    {
+      "issue_id": "ISS-DFFE50FEDB",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-U5MW3L",
+        "PAY-G5RJ67"
+      ],
+      "expected_amount_minor": 505528,
+      "currency": "KWD",
+      "tolerance_minor": 5,
+      "evidence_sets": [
+        [
+          "DOC-PRLNHU4H",
+          "DOC-W6JWQLLJ",
+          "L-KVEBDUL",
+          "L-SGZ7JLS"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-A90A57677E",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "PAY-G5RJ67"
+      ],
+      "expected_amount_minor": 2646,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-PRLNHU4H",
+          "L-PGGJT8H",
+          "fx:2026-02-25:KWD:EUR"
+        ]
+      ],
+      "scenario": "partial_payment_wrong_fx"
+    },
+    {
+      "issue_id": "ISS-C43386B07A",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-HDS54W"
+      ],
+      "expected_amount_minor": 87408,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-VB35J7WB",
+          "L-QAE2S2D",
+          "fx:2026-02-03:KWD:EUR"
+        ],
+        [
+          "DOC-VB35J7WB",
+          "L-YWYM9VH",
+          "fx:2026-02-03:KWD:EUR"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-7E7038BB20",
+      "type": "period_cutoff_error",
+      "affected_ids": [
+        "PAY-DQATY9"
+      ],
+      "expected_amount_minor": 313600,
+      "currency": "EUR",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-S6CRC46N",
+          "L-7FP2NYW"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-C52A754C0E",
+      "type": "missing_or_partial_allocation",
+      "affected_ids": [
+        "INV-EXXK74",
+        "PAY-2AXU3S"
+      ],
+      "expected_amount_minor": 536408,
+      "currency": "USD",
+      "tolerance_minor": 3,
+      "evidence_sets": [
+        [
+          "DOC-C57FW5VW",
+          "DOC-Q9ANBXB9",
+          "L-7DE7ESB",
+          "L-M74NRQ2"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-B7E6172E7A",
+      "type": "duplicate_invoice",
+      "affected_ids": [
+        "INV-MSB5RF",
+        "INV-ZDMNFA"
+      ],
+      "expected_amount_minor": 140400,
+      "currency": "GBP",
+      "tolerance_minor": 0,
+      "evidence_sets": [
+        [
+          "DOC-4CEUFQP7",
+          "DOC-CAGXTV5P",
+          "L-L9W559U"
+        ],
+        [
+          "DOC-4CEUFQP7",
+          "DOC-CAGXTV5P",
+          "L-GAEYZZC"
+        ]
+      ],
+      "scenario": null
+    },
+    {
+      "issue_id": "ISS-1981AF653C",
+      "type": "fx_conversion_error",
+      "affected_ids": [
+        "INV-NGPPXW"
+      ],
+      "expected_amount_minor": 1142,
+      "currency": "EUR",
+      "tolerance_minor": 1,
+      "evidence_sets": [
+        [
+          "DOC-K9DS68J6",
+          "L-XSFRELX",
+          "fx:2026-02-16:KWD:EUR"
+        ],
+        [
+          "DOC-K9DS68J6",
+          "L-N5F34QP",
+          "fx:2026-02-16:KWD:EUR"
+        ]
+      ],
+      "scenario": null
+    }
+  ]
+}

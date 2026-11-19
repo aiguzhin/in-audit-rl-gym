@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "generator_version": "1.0.0",
+  "episode_id": "ep-176bbb636751",
+  "base_currency": "EUR",
+  "currencies": [
+    "CNY",
+    "EUR"
+  ],
+  "currency_exponents": {
+    "CNY": 2,
+    "EUR": 2
+  },
+  "period_start": "2026-03-01",
+  "period_end": "2026-03-31",
+  "period_bounds_local": [
+    "2026-03-01T00:00:00-05:00",
+    "2026-04-01T00:00:00-05:00"
+  ],
+  "timezone": "-05:00",
+  "counts": {
+    "ledger": 410,
+    "invoices": 39,
+    "payments": 24,
+    "fx": 83,
+    "documents": 63
+  },
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "unit": "minor"
+  }
+}

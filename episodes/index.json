@@ -1,0 +1,282 @@
+[
+  {
+    "split": "train",
+    "seed": 1001,
+    "episode_id": "ep-c3f3851862c2",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 7,
+    "counts": {
+      "ledger": 452,
+      "invoices": 50,
+      "payments": 39,
+      "fx": 246,
+      "documents": 89
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1002,
+    "episode_id": "ep-269d527543e1",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 7,
+    "counts": {
+      "ledger": 557,
+      "invoices": 46,
+      "payments": 35,
+      "fx": 240,
+      "documents": 81
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1003,
+    "episode_id": "ep-d27aac3cd7f3",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 6,
+    "counts": {
+      "ledger": 519,
+      "invoices": 85,
+      "payments": 43,
+      "fx": 164,
+      "documents": 128
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1004,
+    "episode_id": "ep-7ee928f446bc",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 7,
+    "counts": {
+      "ledger": 535,
+      "invoices": 40,
+      "payments": 31,
+      "fx": 166,
+      "documents": 71
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1005,
+    "episode_id": "ep-5daadf3a13f5",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 5,
+    "counts": {
+      "ledger": 452,
+      "invoices": 64,
+      "payments": 42,
+      "fx": 166,
+      "documents": 106
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1006,
+    "episode_id": "ep-b3c7dc23675c",
+    "config_hash": "4b2311dc6e89e01d",
+    "issues": 4,
+    "counts": {
+      "ledger": 395,
+      "invoices": 75,
+      "payments": 50,
+      "fx": 83,
+      "documents": 125
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1007,
+    "episode_id": "ep-e36dbb3f39fb",
+    "config_hash": "e499135f419ee7af",
+    "issues": 0,
+    "counts": {
+      "ledger": 515,
+      "invoices": 51,
+      "payments": 29,
+      "fx": 83,
+      "documents": 80
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1008,
+    "episode_id": "ep-89373d1e82dc",
+    "config_hash": "e499135f419ee7af",
+    "issues": 0,
+    "counts": {
+      "ledger": 387,
+      "invoices": 64,
+      "payments": 43,
+      "fx": 82,
+      "documents": 107
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1009,
+    "episode_id": "ep-c0f9acb1f3ac",
+    "config_hash": "81f60a3054dfd6dd",
+    "issues": 8,
+    "counts": {
+      "ledger": 452,
+      "invoices": 64,
+      "payments": 46,
+      "fx": 240,
+      "documents": 110
+    }
+  },
+  {
+    "split": "train",
+    "seed": 1010,
+    "episode_id": "ep-17ae0cb02755",
+    "config_hash": "81f60a3054dfd6dd",
+    "issues": 6,
+    "counts": {
+      "ledger": 498,
+      "invoices": 37,
+      "payments": 25,
+      "fx": 164,
+      "documents": 62
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2001,
+    "episode_id": "ep-263d56a813d4",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 6,
+    "counts": {
+      "ledger": 646,
+      "invoices": 83,
+      "payments": 52,
+      "fx": 166,
+      "documents": 135
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2002,
+    "episode_id": "ep-ca00c62aa117",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 9,
+    "counts": {
+      "ledger": 1049,
+      "invoices": 115,
+      "payments": 70,
+      "fx": 166,
+      "documents": 185
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2003,
+    "episode_id": "ep-21bd307e30c5",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 8,
+    "counts": {
+      "ledger": 712,
+      "invoices": 88,
+      "payments": 57,
+      "fx": 82,
+      "documents": 145
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2004,
+    "episode_id": "ep-92addd6cc2f1",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 8,
+    "counts": {
+      "ledger": 1073,
+      "invoices": 83,
+      "payments": 51,
+      "fx": 166,
+      "documents": 134
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2005,
+    "episode_id": "ep-d16f086e4fc8",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 0,
+    "counts": {
+      "ledger": 821,
+      "invoices": 125,
+      "payments": 76,
+      "fx": 249,
+      "documents": 201
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2006,
+    "episode_id": "ep-634159f47351",
+    "config_hash": "7f416e1fb264c021",
+    "issues": 7,
+    "counts": {
+      "ledger": 1102,
+      "invoices": 125,
+      "payments": 72,
+      "fx": 82,
+      "documents": 197
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2007,
+    "episode_id": "ep-176bbb636751",
+    "config_hash": "e499135f419ee7af",
+    "issues": 0,
+    "counts": {
+      "ledger": 410,
+      "invoices": 39,
+      "payments": 24,
+      "fx": 83,
+      "documents": 63
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2008,
+    "episode_id": "ep-67b6433ff849",
+    "config_hash": "e499135f419ee7af",
+    "issues": 0,
+    "counts": {
+      "ledger": 436,
+      "invoices": 64,
+      "payments": 41,
+      "fx": 246,
+      "documents": 105
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2009,
+    "episode_id": "ep-b35141cc29b6",
+    "config_hash": "81f60a3054dfd6dd",
+    "issues": 9,
+    "counts": {
+      "ledger": 701,
+      "invoices": 85,
+      "payments": 66,
+      "fx": 80,
+      "documents": 151
+    }
+  },
+  {
+    "split": "dev",
+    "seed": 2010,
+    "episode_id": "ep-086506c6836e",
+    "config_hash": "81f60a3054dfd6dd",
+    "issues": 8,
+    "counts": {
+      "ledger": 593,
+      "invoices": 58,
+      "payments": 42,
+      "fx": 166,
+      "documents": 100
+    }
+  }
+]
