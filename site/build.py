@@ -63,6 +63,7 @@ FOOT = """</main>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/auth.js"></script>
+<script src="assets/floaters.js"></script>
 <script src="assets/guide.js"></script>
 {script}
 </body>
@@ -98,7 +99,7 @@ def next_panel(f):
 def inner_page(f):
     p = INNER[f]
     rest = p["rest"].replace('<div class="calc" data-r', '<div class="calc glass" data-r')
-    return f"""<section class="panel">
+    return f"""<section class="panel" data-float="head">
   {grid((22, 78), (78,), ((22, 78), (78, 78)))}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
     <div class="crumbs"><span class="label"><span class="num">{p["num"]}</span> · {p["crumb"]}</span><span class="label">Fin-Audit RL Gym</span></div>
@@ -111,7 +112,7 @@ def inner_page(f):
 
 
 
-PLAY = """<section class="panel">
+PLAY = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
     <div class="crumbs"><span class="label"><span class="num">01</span> · Песочница</span><span class="label">Настоящая среда · Python в браузере</span></div>
@@ -164,7 +165,7 @@ PLAY = """<section class="panel">
 </div></div></section>
 """
 
-LEADERS = """<section class="panel">
+LEADERS = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
     <div class="crumbs"><span class="label"><span class="num">02</span> · Лидеры</span><span class="label">Результаты из базы данных</span></div>
@@ -182,7 +183,7 @@ LEADERS = """<section class="panel">
 PROFILE = """<section class="panel"><div class="content"><div class="wrap" id="profile"><p class="empty"><span class="spin"></span> Загружаем…</p></div></div></section>
 """
 
-NOTFOUND = """<section class="panel hero-404">
+NOTFOUND = """<section class="panel hero-404" data-float="c">
   <div class="stars"></div>{grid}
   <div class="wrap nf"><div class="nf-code">404</div><h1 class="title">Такой страницы<br>нет в книгах</h1>
     <p class="intro">Похоже, ссылка устарела или в адресе опечатка. Как и ошибка в проводке — бывает.</p>
@@ -200,7 +201,7 @@ BOOK = """<div class="book-stage" aria-hidden="true"><div class="book-glow"></di
 
 RINGS = "".join(f'<ellipse cx="60" cy="120" rx="{18 + i * 14}" ry="{8 + i * 7}" transform="rotate(-{20 + i * 6} 60 120)"/>' for i in range(7))
 
-INDEX = f"""<section class="panel hero">
+INDEX = f"""<section class="panel hero" data-float="hero">
   <div class="stars"></div>{grid((30, 70), (), ())}
   <div class="wrap">
     <div class="giant" aria-hidden="true">Fin-Audit</div>
@@ -222,7 +223,7 @@ INDEX = f"""<section class="panel hero">
   </div>
 </section>
 
-<section class="panel sec simple-panel">
+<section class="panel sec simple-panel" data-float="a">
   {grid((33.3, 66.6), (), ())}
   <div class="wrap">
     <p class="label center">Простыми словами</p>
@@ -237,7 +238,7 @@ INDEX = f"""<section class="panel hero">
   </div>
 </section>
 
-<section class="panel sec">
+<section class="panel sec" data-float="b">
   {grid((27, 73), (14, 88), ((27, 14), (73, 14), (27, 88), (73, 88)))}
   <div class="wrap">
     <p class="statement" data-r>Компания на месяц. <span class="d">Сотни проводок.</span> Несколько <span class="d">тихих</span> ошибок.</p>
@@ -277,7 +278,7 @@ INDEX = f"""<section class="panel hero">
   </div>
 </section>
 
-<section class="panel final">
+<section class="panel final" data-float="c">
   <div class="stars"></div>{grid((22, 76), (30, 74), ((22, 30), (76, 30), (22, 74), (76, 74)))}
   <div class="wrap">
     <p class="statement" data-r>Вся проверка — <span class="d">одна команда,</span> десять секунд <span class="d">и ноль облака.</span></p>

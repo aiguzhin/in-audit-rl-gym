@@ -626,3 +626,15 @@ table.board tr.mine td{background:rgba(74,144,255,.18)}
 .glass,.panel{--mx:-999px;--my:-999px}
 .glass{background-image:radial-gradient(420px circle at var(--mx) var(--my),rgba(120,170,255,.13),transparent 45%),linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03))}
 .panel::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(700px circle at var(--mx) var(--my),rgba(74,144,255,.07),transparent 50%)}
+
+/* ---------- парящие предметы ---------- */
+.floaters{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.flo{position:absolute;will-change:transform;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.flo svg{display:block;width:100%;height:auto;overflow:visible}
+.flo-in{transform:rotate(var(--rot));animation:drift var(--dur) ease-in-out infinite alternate;animation-delay:var(--del)}
+@keyframes drift{0%{transform:translate3d(0,0,0) rotate(var(--rot))}35%{transform:translate3d(12px,-18px,0) rotate(calc(var(--rot) + 4deg))}70%{transform:translate3d(-8px,-34px,0) rotate(calc(var(--rot) - 3deg))}100%{transform:translate3d(6px,-12px,0) rotate(calc(var(--rot) + 2deg))}}
+.flo{animation:floin 1.6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--dep) * -0.4s + .3s)}
+@keyframes floin{from{opacity:0}}
+.hero .wrap,.page-head,.sec .wrap,.final .wrap{position:relative;z-index:1}
+@media(max-width:700px){.flo{opacity:.35!important}}
+@media(prefers-reduced-motion:reduce){.flo-in{animation:none}}
