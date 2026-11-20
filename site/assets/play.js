@@ -376,6 +376,7 @@ def baseline(name):
 
   // ================================================================ сохранение, компания дня, базовые политики
   function bindSave(stepsUsed) { const f = $("#pl-save"), msg = $("#save-msg"), u = AUTH.user();
+    if (!u) { f.innerHTML = `<div><div class="t">Сохранить результат</div><p class="label">Сессия закончилась. <a href="${location.pathname}">Войдите снова</a>, чтобы сохранить результат в профиль.</p></div>`; return; }
     if (u) { $("#pl-name-wrap").hidden = true; $("#pl-save-who").innerHTML = `Сохранится в профиль <b>${esc(u.display)}</b>.`; }
     else { try { $("#pl-name").value = localStorage.getItem("fa-name") || ""; } catch (e) {}
       $("#pl-save-who").innerHTML = '<a href="profile.html">Войдите</a>, чтобы результаты копились в профиле и открывали достижения.'; }

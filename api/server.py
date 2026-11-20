@@ -7,6 +7,8 @@
   POST /api/register   {username, password, display?}      -> {token, user}
   POST /api/login      {username, password}                -> {token, user}
   GET  /api/check-username?u=логин                        -> {valid, available}
+  POST /api/password   {old, new}  (с токеном)             -> {ok}
+  POST /api/profile    {display}   (с токеном)             -> {user}
   GET  /api/me         (Authorization: Bearer <token>)     -> профиль, статистика, история, достижения
   GET  /api/daily                                          -> номер «компании дня»
   GET  /api/leaderboard?limit=20&scope=all|daily
@@ -227,7 +229,34 @@ ACHIEVEMENTS = [
     ("thrifty", "Экономный", "Награда выше 0.8 меньше чем за 25 шагов"),
     ("daily", "Компания дня", "Пройти компанию дня"),
     ("ten", "Опытный аудитор", "Сохранить 10 результатов"),
+    ("streak3", "Три дня подряд", "Сохранять результаты три дня подряд"),
 ]
+
+
+def day_of(ts) -> str:
+    """Дата результата по Астане (YYYY-MM-DD) — из TIMESTAMPTZ Postgres или текста SQLite (UTC)."""
+    if isinstance(ts, dt.datetime):
+        d = ts if ts.tzinfo else ts.replace(tzinfo=dt.timezone.utc)
+    else:
+        try:
+            d = dt.datetime.fromisoformat(str(ts).replace(" ", "T"))
+        except ValueError:
+            return str(ts)[:10]
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=dt.timezone.utc)
+    return d.astimezone(TZ).date().isoformat()
+
+
+def streak_of(days: set[str]) -> int:
+    """Сколько дней подряд (до сегодня или вчера) есть хотя бы один результат."""
+    d = dt.datetime.now(TZ).date()
+    if d.isoformat() not in days:
+        d -= dt.timedelta(days=1)
+    n = 0
+    while d.isoformat() in days:
+        n += 1
+        d -= dt.timedelta(days=1)
+    return n
 
 
 def me(uid: int) -> dict:
@@ -237,6 +266,8 @@ def me(uid: int) -> dict:
     rows = get_db().exec("SELECT created_at, seed, preset, reward, f1, tp, fp, fn, steps, clean, day FROM results "
                          "WHERE user_id = ? ORDER BY id DESC LIMIT 200", (uid,), fetch=True)
     keys = ("created_at", "seed", "preset", "reward", "f1", "tp", "fp", "fn", "steps", "clean", "day")
+    days = {day_of(r[0]) for r in rows}
+    streak = streak_of(days)
     hist = [{k: (str(v) if k == "created_at" else v) for k, v in zip(keys, r)} for r in rows]
     n = len(hist)
     got = set()
@@ -257,6 +288,8 @@ def me(uid: int) -> dict:
             got.add("daily")
     if n >= 10:
         got.add("ten")
+    if streak >= 3:
+        got.add("streak3")
     best = max((h["reward"] for h in hist), default=None)
     rank = None
     if best is not None:
@@ -264,22 +297,49 @@ def me(uid: int) -> dict:
     return {"user": user_public(u[0]),
             "stats": {"runs": n, "best": best, "avg": (sum(h["reward"] for h in hist) / n) if n else None,
                       "avg_f1": (sum(h["f1"] or 0 for h in hist) / n) if n else None,
-                      "found": sum(h["tp"] or 0 for h in hist), "false": sum(h["fp"] or 0 for h in hist), "rank": rank},
+                      "found": sum(h["tp"] or 0 for h in hist), "false": sum(h["fp"] or 0 for h in hist), "rank": rank,
+                      "streak": streak, "days": len(days), "today": today() in days},
             "history": hist,
             "achievements": [{"id": a, "title": t, "hint": d, "done": a in got} for a, t, d in ACHIEVEMENTS]}
 
 
+def change_password(body: dict, ip: str, uid: int | None) -> dict:
+    rate("auth:" + ip, 8)
+    if not uid:
+        raise ApiError(401, "Войдите в аккаунт.")
+    row = get_db().exec("SELECT pass_hash FROM users WHERE id = ?", (uid,), fetch=True)
+    if not row:
+        raise ApiError(401, "Сессия устарела. Войдите снова.")
+    if not check_password(str(body.get("old", "")), row[0][0]):
+        raise ApiError(400, "Текущий пароль введён неверно.")
+    new = str(body.get("new", ""))
+    if len(new) < 8 or len(new) > 200:
+        raise ApiError(400, "Новый пароль должен быть не короче 8 символов.")
+    get_db().exec("UPDATE users SET pass_hash = ? WHERE id = ?", (hash_password(new), uid))
+    return {"ok": True}
+
+
+def update_profile(body: dict, ip: str, uid: int | None) -> dict:
+    rate("prof:" + ip, 20)
+    if not uid:
+        raise ApiError(401, "Войдите в аккаунт.")
+    display = NAME_RE.sub("", str(body.get("display", "")))[:32].strip()
+    if len(display) < 2:
+        raise ApiError(400, "Имя должно содержать от 2 до 32 символов.")
+    get_db().exec("UPDATE users SET display = ? WHERE id = ?", (display, uid))
+    get_db().exec("UPDATE results SET name = ? WHERE user_id = ?", (display, uid))
+    u = get_db().exec("SELECT id, username, display, created_at FROM users WHERE id = ?", (uid,), fetch=True)
+    return {"user": user_public(u[0])}
+
+
 def submit(body: dict, ip: str, uid: int | None) -> dict:
     rate("res:" + ip, 10)
-    if uid:
-        u = get_db().exec("SELECT display FROM users WHERE id = ?", (uid,), fetch=True)
-        if not u:
-            raise ApiError(401, "Сессия устарела. Войдите снова.")
-        name = u[0][0]
-    else:
-        name = NAME_RE.sub("", str(body.get("name", "")))[:32].strip()
-        if len(name) < 2:
-            raise ApiError(400, "Имя должно содержать от 2 до 32 символов.")
+    if not uid:
+        raise ApiError(401, "Войдите в аккаунт, чтобы сохранить результат.")
+    u = get_db().exec("SELECT display FROM users WHERE id = ?", (uid,), fetch=True)
+    if not u:
+        raise ApiError(401, "Сессия устарела. Войдите снова.")
+    name = u[0][0]
     try:
         seed = int(body.get("seed"))
         steps = int(body.get("steps", 0))
@@ -399,7 +459,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
-        if path not in ("/api/results", "/api/register", "/api/login"):
+        if path not in ("/api/results", "/api/register", "/api/login", "/api/password", "/api/profile"):
             return self._json(404, {"error": "Не найдено."})
         length = int(self.headers.get("Content-Length") or 0)
         if length <= 0 or length > MAX_BODY:
@@ -415,6 +475,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle(lambda: register(body, ip))
         if path == "/api/login":
             return self._handle(lambda: login(body, ip))
+        if path == "/api/password":
+            return self._handle(lambda: change_password(body, ip, self._uid()))
+        if path == "/api/profile":
+            return self._handle(lambda: update_profile(body, ip, self._uid()))
         return self._handle(lambda: submit(body, ip, self._uid()))
 
     def log_message(self, fmt, *args):

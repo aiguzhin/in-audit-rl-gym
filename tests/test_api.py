@@ -48,6 +48,27 @@ class TestAPI(unittest.TestCase):
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read())
 
+    def token(self, username, display=None):
+        c, r = self.req("/api/register", {"username": username, "password": "secret-123", "display": display or username})
+        if c == 409:
+            c, r = self.req("/api/login", {"username": username, "password": "secret-123"})
+        return r["token"]
+
+    def test_account_settings_and_streak(self):
+        tok = self.token("settings_1", "Старое имя")
+        self.assertEqual(self.req("/api/password", {"old": "wrong-pass", "new": "new-secret-1"}, token=tok)[0], 400)
+        self.assertEqual(self.req("/api/password", {"old": "secret-123", "new": "short"}, token=tok)[0], 400)
+        self.assertEqual(self.req("/api/password", {"old": "secret-123", "new": "new-secret-1"}, token=tok)[0], 200)
+        self.assertEqual(self.req("/api/login", {"username": "settings_1", "password": "new-secret-1"})[0], 200)
+        c, r = self.req("/api/profile", {"display": "Новое имя"}, token=tok)
+        self.assertEqual((c, r["user"]["display"]), (200, "Новое имя"))
+        self.assertEqual(self.req("/api/profile", {"display": "x"}, token=tok)[0], 400)
+        self.assertEqual(self.req("/api/password", {"old": "a", "new": "b"})[0], 401)
+        self.req("/api/results", {"seed": 5, "preset": "clean", "steps": 3, "findings": []}, token=tok)
+        me = self.req("/api/me", token=tok)[1]
+        self.assertEqual((me["stats"]["streak"], me["stats"]["today"]), (1, True))
+        self.assertEqual(server.streak_of({"2000-01-01"}), 0)
+
     def test_register_login_me(self):
         c, r = self.req("/api/register", {"username": "aigerim_1", "password": "secret-123", "display": "Айгерим"})
         self.assertEqual(c, 200, r)
@@ -71,30 +92,29 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(self.req("/api/register", {"username": "good_name", "password": "short"})[0], 400)
         self.assertEqual(self.req("/api/me")[0], 401)
         self.assertEqual(self.req("/api/me", token="forged.token")[0], 401)
-        self.assertEqual(self.req("/api/results", {"name": "Гость", "seed": 1, "preset": "nope", "steps": 1, "findings": []})[0], 400)
-        self.assertEqual(self.req("/api/results", {"name": "Гость", "seed": 1, "preset": "mixed", "steps": 1, "findings": "x"})[0], 400)
+        self.assertEqual(self.req("/api/results", {"seed": 1, "preset": "mixed", "steps": 1, "findings": []})[0], 401)
+        tok = self.token("bad_inputs")
+        self.assertEqual(self.req("/api/results", {"seed": 1, "preset": "nope", "steps": 1, "findings": []}, token=tok)[0], 400)
+        self.assertEqual(self.req("/api/results", {"seed": 1, "preset": "mixed", "steps": 1, "findings": "x"}, token=tok)[0], 400)
 
     def test_server_recomputes_score(self):
         fake = truth_findings(2026)[:1]
         fake[0]["claimed_amount_minor"] += 999
-        c, r = self.req("/api/results", {"name": "Хитрец", "seed": 2026, "preset": "mixed", "steps": 0, "findings": fake})
+        c, r = self.req("/api/results", {"seed": 2026, "preset": "mixed", "steps": 0, "findings": fake}, token=self.token("hitrets"))
         self.assertEqual(c, 200)
         self.assertEqual(r["tp"], 0)
 
     def test_daily(self):
         c, d = self.req("/api/daily")
         seed = d["seed"]
-        c, r = self.req("/api/results", {"name": "Гость дня", "seed": seed, "preset": "mixed", "steps": 10,
-                                         "findings": truth_findings(seed)})
+        c, r = self.req("/api/results", {"seed": seed, "preset": "mixed", "steps": 10,
+                                         "findings": truth_findings(seed)}, token=self.token("gost_dnya", "Гость дня"))
         self.assertTrue(r["daily"])
         c, lb = self.req("/api/leaderboard?scope=daily")
         self.assertEqual(lb["results"][0]["name"], "Гость дня")
         c, s = self.req("/api/stats")
         self.assertGreaterEqual(s["today"], 1)
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class TestUsernameCheck(TestAPI):
@@ -105,3 +125,7 @@ class TestUsernameCheck(TestAPI):
         self.assertFalse(self.req("/api/check-username?u=taken_1")[1]["available"])
         bad = self.req("/api/check-username?u=ab")[1]
         self.assertFalse(bad["valid"])
+
+
+if __name__ == "__main__":
+    unittest.main()

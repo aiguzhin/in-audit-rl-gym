@@ -37,7 +37,8 @@
   window.AUTH = {
     api, session: read, user: () => (read() || {}).user || null,
     login(data) { write({ token: data.token, user: data.user }); renderChip(); },
-    logout() { write(null); renderChip(); },
+    logout() { write(null); try { sessionStorage.removeItem("fs-ok"); } catch (e) {} renderChip(); },
+    setUser(user) { const s = read(); if (s) { s.user = user; write(s); renderChip(); } },
     initials,
   };
   renderChip();

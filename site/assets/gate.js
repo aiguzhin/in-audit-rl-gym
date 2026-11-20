@@ -1,8 +1,13 @@
 /* FinSpector · вход на сайт: короткая регистрация в два шага (или вход), пока её нет — сайт закрыт.
    Всё проверяется прямо при вводе: свободен ли логин, надёжен ли пароль, что не так и как поправить. */
 (function () {
-  if (!window.AUTH || AUTH.user()) return;
-  try { if (sessionStorage.getItem("fs-guest")) return; } catch (e) {}
+  if (!window.AUTH) return;
+  if (AUTH.user()) {                                   // проверяем, что сессия ещё действует (раз за визит)
+    let checked = false; try { checked = sessionStorage.getItem("fs-ok") === AUTH.session().token.slice(-12); } catch (e) {}
+    if (!checked) AUTH.api("/api/me", { timeout: 60000 }).then(() => { try { sessionStorage.setItem("fs-ok", AUTH.session().token.slice(-12)); } catch (e) {} })
+      .catch(e => { if (e.status === 401) location.reload(); });
+    return;
+  }
   const { esc } = UI;
   const GOALS = { learn: ["lessons.html", "Начать с урока"], play: ["play.html?daily=1", "Пройти компанию дня"], code: ["python.html", "Открыть Python"] };
   const TR = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
@@ -161,11 +166,9 @@
     const err = body.querySelector("#gt-err"); err.textContent = ""; btn.disabled = true;
     const label = btn.innerHTML; btn.innerHTML = '<span class="spin"></span> Подождите…';
     const slow = setTimeout(() => { err.className = "gt-err info"; err.textContent = "Сервер просыпается после простоя — это бывает до минуты. Не закрывайте страницу."; }, 3500);
-    try { const r = await AUTH.api(path, { method: "POST", body: payload, auth: false }); clearTimeout(slow); AUTH.login(r); welcome(r.user, path === "/api/register"); }
+    try { const r = await AUTH.api(path, { method: "POST", body: payload, auth: false }); clearTimeout(slow); AUTH.login(r); dispatchEvent(new CustomEvent("fs:auth", { detail: r.user })); welcome(r.user, path === "/api/register"); }
     catch (e) { clearTimeout(slow); err.className = "gt-err"; err.textContent = e.message; btn.disabled = false; btn.innerHTML = label; if (onErr) onErr(e.message);
-      if (!e.status) {                                 // сервер недоступен — не запираем человека снаружи
-        err.insertAdjacentHTML("beforeend", ` <button type="button" class="gt-link" id="gt-guest">Продолжить без аккаунта</button>`);
-        body.querySelector("#gt-guest").onclick = () => { try { sessionStorage.setItem("fs-guest", "1"); } catch (x) {} close(); }; } }
+      if (!e.status) err.insertAdjacentHTML("beforeend", ` <button type="button" class="gt-link" id="gt-retry">Повторить</button>`), body.querySelector("#gt-retry").onclick = () => btn.click(); }
   }
   function welcome(user, isNew) {
     const [href, cta] = GOALS[st.goal];

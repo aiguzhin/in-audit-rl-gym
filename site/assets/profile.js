@@ -47,6 +47,51 @@
       ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.reward)}" r="3.5" class="${p.reward < 0 ? "neg" : "pos"}"><title>${fmt(p.reward)}</title></circle>`).join("")}</svg>`;
   }
 
+  const lessonsDone = () => { try { return Object.keys(JSON.parse(localStorage.getItem("fs-lessons")) || {}).length; } catch (e) { return 0; } };
+  function today(s, ach) {
+    const next = ach.find(a => !a.done), L = lessonsDone();
+    const fire = s.streak ? `<b class="big">${s.streak}</b><span>${plural(s.streak, "день", "дня", "дней")} подряд</span>` : `<b class="big">0</b><span>дней подряд</span>`;
+    return `<div class="pf-today">
+      <div class="glass pt-card"><span class="label">Серия</span><div class="pt-row">${fire}</div>
+        <p>${s.today ? "Сегодня результат уже есть — серия продолжается." : s.streak ? "Сохраните результат сегодня, чтобы не прервать серию." : "Сохраняйте хотя бы один результат в день — получите достижение «Три дня подряд»."}</p>
+        ${s.today ? "" : `<a class="btn plain" href="play.html?daily=1">Компания дня</a>`}</div>
+      <div class="glass pt-card"><span class="label">Уроки</span><div class="pt-row"><b class="big">${L}</b><span>из 4 пройдено</span></div>
+        <div class="meter"><i style="width:${L / 4 * 100}%"></i></div>
+        <p>${L >= 4 ? "Все уроки пройдены. Попробуйте сложный сценарий в песочнице." : "Короткие уроки по каждому типу ошибки — по 1–2 минуты."}</p>
+        <a class="btn plain" href="${L >= 4 ? "play.html?preset=inter" : "lessons.html"}">${L >= 4 ? "Сложная компания" : L ? "Продолжить уроки" : "Начать уроки"}</a></div>
+      <div class="glass pt-card"><span class="label">Следующее достижение</span>${next ? `<div class="pt-row"><b>${next.title}</b></div><p>${next.hint}.</p>` : `<div class="pt-row"><b>Все собраны!</b></div><p>Вы получили все достижения FinSpector.</p>`}
+        <a class="btn plain" href="play.html">Новый аудит</a></div></div>`;
+  }
+  function plural(n, a, b, c) { n = Math.abs(n) % 100; const d = n % 10; return n > 10 && n < 20 ? c : d === 1 ? a : d > 1 && d < 5 ? b : c; }
+  const confirmOut = () => window.confirm("Выйти из аккаунта? Чтобы вернуться, понадобятся логин и пароль.");
+  function settings(u) {
+    return `<div class="glass pf-card pf-set"><div class="t">Настройки аккаунта</div>
+      <div class="set-grid">
+        <form id="set-name" class="set-f" novalidate><b>Имя в рейтинге</b><p class="label">Сейчас: ${esc(u.display)}. Изменится и в прошлых результатах.</p>
+          <label class="fld"><span>Новое имя</span><input id="sn-in" maxlength="32" value="${esc(u.display)}" autocomplete="nickname"></label>
+          <p class="set-msg" id="sn-msg" role="status"></p><button class="btn plain" type="submit">Сохранить имя</button></form>
+        <form id="set-pass" class="set-f" novalidate><b>Пароль</b><p class="label">Восстановить пароль без почты нельзя — меняйте его здесь.</p>
+          <input type="text" autocomplete="username" value="${esc(u.username)}" hidden>
+          <label class="fld"><span>Текущий пароль</span><input id="sp-old" type="password" autocomplete="current-password"></label>
+          <label class="fld"><span>Новый пароль · от 8 символов</span><input id="sp-new" type="password" autocomplete="new-password" minlength="8"></label>
+          <label class="sp-show"><input type="checkbox" id="sp-show"> Показать пароли</label>
+          <p class="set-msg" id="sp-msg" role="status"></p><button class="btn plain" type="submit">Сменить пароль</button></form>
+        <div class="set-f"><b>Выход</b><p class="label">Вы вошли как @${esc(u.username)}. После выхода сайт снова попросит войти.</p><button class="chip" id="logout">Выйти из аккаунта</button></div>
+      </div></div>`;
+  }
+  function bindSettings() {
+    const msg = (el, t, ok) => { el.className = "set-msg " + (ok ? "good" : "bad"); el.textContent = t; };
+    $("#set-name").onsubmit = async e => { e.preventDefault(); const v = $("#sn-in").value.trim(), m = $("#sn-msg"), b = e.target.querySelector("button");
+      if (v.length < 2) return msg(m, "Имя должно содержать от 2 до 32 символов.");
+      b.disabled = true; try { const r = await AUTH.api("/api/profile", { method: "POST", body: { display: v } }); AUTH.setUser(r.user); msg(m, "Имя сохранено.", true); e.target.querySelector(".label").textContent = `Сейчас: ${r.user.display}. Изменится и в прошлых результатах.`;
+        $(".pf-id h2").textContent = r.user.display; $(".pf-av").textContent = AUTH.initials(r.user.display); } catch (x) { msg(m, x.message); } b.disabled = false; };
+    $("#sp-show").onchange = e => { ["#sp-old", "#sp-new"].forEach(s => $(s).type = e.target.checked ? "text" : "password"); };
+    $("#set-pass").onsubmit = async e => { e.preventDefault(); const o = $("#sp-old").value, n = $("#sp-new").value, m = $("#sp-msg"), b = e.target.querySelector("button");
+      if (!o) return msg(m, "Введите текущий пароль."); if (n.length < 8) return msg(m, "Новый пароль должен быть не короче 8 символов.");
+      if (n === o) return msg(m, "Новый пароль совпадает с текущим.");
+      b.disabled = true; try { await AUTH.api("/api/password", { method: "POST", body: { old: o, new: n } }); msg(m, "Пароль изменён. Запишите его.", true); e.target.reset(); } catch (x) { msg(m, x.message); } b.disabled = false; };
+  }
+
   async function load() {
     if (!AUTH.user()) return authView();
     root.innerHTML = `<p class="empty"><span class="spin"></span> Загружаем профиль… Бесплатный сервер просыпается до минуты.</p>`;
@@ -63,6 +108,7 @@
       <div class="pf-stats">${[["Прохождений", s.runs], ["Лучший балл", s.best == null ? "—" : fmt(s.best)], ["Средний балл", s.avg == null ? "—" : fmt(s.avg)],
         ["Средний F1", s.avg_f1 == null ? "—" : s.avg_f1.toFixed(2)], ["Найдено ошибок", s.found], ["Место в рейтинге", s.rank ? "#" + s.rank : "—"]]
         .map(([k, v]) => `<div class="glass"><span class="label">${k}</span><b>${v}</b></div>`).join("")}</div>
+      ${today(s, d.achievements)}
       <div class="pf-grid">
         <div class="glass pf-card"><div class="t">Прогресс</div><p class="label">Награда за последние прохождения</p>${chart(d.history)}</div>
         <div class="glass pf-card"><div class="t">Достижения <span class="label">${got} из ${d.achievements.length}</span></div>
@@ -72,8 +118,11 @@
         ${d.history.length ? `<div class="tbl-wrap"><table class="grid board"><thead><tr><th>Когда</th><th>Компания</th><th>Награда</th><th>F1</th><th>TP / FP / FN</th><th>Шаги</th></tr></thead><tbody>
         ${d.history.map((h, i) => `<tr style="--k:${Math.min(i, 20)}"><td>${date(h.created_at)}</td><td>№${h.seed} · ${PRESET_RU[h.preset] || h.preset}${h.day ? ' <span class="tag-day">день</span>' : ""}</td>
           <td class="num"><em class="${h.reward < 0 ? "neg" : "pos"}">${fmt(h.reward)}</em></td><td class="num">${(h.f1 || 0).toFixed(2)}</td><td>${h.tp} / ${h.fp} / ${h.fn}</td><td class="num">${h.steps}</td></tr>`).join("")}
-        </tbody></table></div>` : `<p class="empty">Пока пусто. Пройдите аудит в песочнице и сохраните результат — он появится здесь.</p>`}</div>`;
-    $("#logout").onclick = () => { AUTH.logout(); authView(); };
+        </tbody></table></div>` : `<p class="empty">Пока пусто. Пройдите аудит в песочнице и сохраните результат — он появится здесь.</p>`}</div>
+      ${settings(u)}`;
+    $("#logout").onclick = () => { if (confirmOut()) { AUTH.logout(); location.href = "index.html"; } };
+    bindSettings();
   }
+  addEventListener("fs:auth", load);
   load();
 })();
