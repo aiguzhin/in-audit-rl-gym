@@ -15,9 +15,23 @@
   const side = (p1, p2, t) => [p1, p2, ext(p2, t), ext(p1, t)].map(pt).join(" ");
 
   // ---------- общие фильтры ----------
+  // Материал: зерно (бумага, кожа, пластик) + рельефный блик по краям от света сверху-слева.
   const defsCommon = id => `
-    <filter id="${id}sh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="14" stdDeviation="10" flood-color="#000" flood-opacity=".55"/></filter>
-    <radialGradient id="${id}glow"><stop offset="0" stop-color="#4A90FF" stop-opacity=".45"/><stop offset="1" stop-color="#4A90FF" stop-opacity="0"/></radialGradient>`;
+    <filter id="${id}sh" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${(id.length * 7) % 97}" result="n"/>
+      <feColorMatrix in="n" type="matrix" values=".33 .33 .33 0 0  .33 .33 .33 0 0  .33 .33 .33 0 0  0 0 0 0 .16" result="g"/>
+      <feComposite in="g" in2="SourceAlpha" operator="in" result="gc"/>
+      <feBlend in="gc" in2="SourceGraphic" mode="overlay" result="tex"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="b"/>
+      <feSpecularLighting in="b" surfaceScale="2.2" specularConstant=".7" specularExponent="16" lighting-color="#E4EFFF" result="s"><feDistantLight azimuth="225" elevation="40"/></feSpecularLighting>
+      <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+      <feComposite in="tex" in2="sc" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0" result="lit"/>
+      <feDiffuseLighting in="b" surfaceScale="2.2" diffuseConstant="1" lighting-color="#fff" result="d"><feDistantLight azimuth="225" elevation="55"/></feDiffuseLighting>
+      <feComposite in="d" in2="SourceAlpha" operator="in" result="dc"/>
+      <feBlend in="dc" in2="lit" mode="multiply" result="sh1"/>
+      <feComposite in="sh1" in2="SourceAlpha" operator="in"/>
+    </filter>
+    <radialGradient id="${id}glow"><stop offset="0" stop-color="#4A90FF" stop-opacity=".22"/><stop offset="1" stop-color="#4A90FF" stop-opacity="0"/></radialGradient>`;
 
   // ================================================================ МОДЕЛИ
   function book(id, cover = ["#1E3A66", "#0B1830"], title = "LEDGER") {
@@ -209,28 +223,58 @@
   }
 
   const MODELS = { book, calculator, coins, magnifier, pen, receipt, abacus, stamp, folder, chartCard };
-  const BOOK2 = id => book(id, ["#5A2330", "#24101A"], "AUDIT");
-  const BOOK3 = id => book(id, ["#1F4A3A", "#0B1E17"], "2026");
+
+  // ================================================================ РЕНДЕР
+  // Каждая модель один раз растеризуется в картинку: дальше браузер только двигает готовый слой (без перерисовки и фризов).
+  const cache = new Map();
+  function toImg(fn, blur) {
+    const key = fn.name + "|" + blur;
+    if (cache.has(key)) return cache.get(key);
+    let svg = fn("f" + (uid++) + "_");
+    const vb = /viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"/.exec(svg).slice(1).map(Number);
+    const pad = Math.max(vb[2], vb[3]) * .14;
+    const nvb = [vb[0] - pad, vb[1] - pad, vb[2] + pad * 2, vb[3] + pad * 2];
+    const dof = blur ? `<filter id="dof${uid}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(blur * vb[2] / 160).toFixed(2)}"/></filter>` : "";
+    svg = svg.replace(/<svg viewBox="[^"]+">/, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${nvb.join(" ")}" width="${nvb[2] * 3}" height="${nvb[3] * 3}">${dof}<g${blur ? ` filter="url(#dof${uid})"` : ""}>`).replace(/<\/svg>$/, "</g></svg>");
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    const res = { url, ratio: nvb[3] / nvb[2], pad: pad / nvb[2] };
+    cache.set(key, res);
+    return res;
+  }
 
   // ================================================================ СЦЕНЫ
-  // [модель, left%, top%, ширина px, глубина 0..1 (1 — ближе), поворот°]
+  // [модель, left%, top%, ширина px, глубина 0..1 (1 — ближе к зрителю), поворот°]
+  // Свет сверху-слева: тени падают вниз-вправо. Дальние предметы мельче и размыты, ближние — крупные и тоже в «боке».
+  const BOOK2 = function book2(id) { return book(id, ["#6A2634", "#2A0F18"], "AUDIT"); };
+  const BOOK3 = function book3(id) { return book(id, ["#21604A", "#0A2219"], "2026"); };
   const SCENES = {
-    hero: [[book, 3, 10, 170, .55, -14], [calculator, 86, 52, 140, .75, 12], [coins, 4, 42, 120, .7, 0], [magnifier, 80, 6, 120, .4, -20],
-           [pen, 38, 90, 160, .35, 8], [BOOK2, 66, 74, 150, .3, 18], [receipt, 92, 22, 110, .25, -8], [stamp, 22, 24, 84, .2, 10]],
-    a: [[abacus, 2, 8, 170, .55, -6], [BOOK3, 86, 60, 160, .6, 14], [receipt, 82, 6, 120, .35, 10], [coins, 6, 70, 110, .3, 0], [pen, 46, 88, 150, .2, -6]],
-    b: [[calculator, 4, 20, 130, .5, -10], [folder, 84, 8, 160, .55, 8], [magnifier, 88, 62, 120, .4, 16], [book, 10, 72, 140, .3, 12], [chartCard, 50, 4, 120, .2, -8]],
-    c: [[stamp, 6, 12, 120, .55, -8], [BOOK2, 82, 14, 160, .6, 12], [coins, 86, 66, 120, .4, 0], [calculator, 2, 62, 120, .35, 16], [receipt, 46, 80, 110, .2, -10]],
-    head: [[book, 70, 30, 150, .5, 12], [calculator, 90, 50, 110, .35, -10], [coins, 66, 64, 100, .25, 0], [pen, 54, 8, 140, .2, -10]],
+    hero: [[abacus, 72, 7, 120, .18, -8], [stamp, 31, 9, 64, .14, 10],
+           [BOOK3, 1, 8, 240, .72, -16], [pen, 5, 24, 200, .82, 20], [coins, 14, 36, 150, .66, 0],
+           [receipt, 88, 36, 140, .48, -10], [calculator, 79, 55, 220, .86, 14], [BOOK2, 44, 87, 130, .3, 18],
+           [magnifier, 64, 74, 250, 1, -28]],
+    a: [[chartCard, 46, 3, 120, .16, -8], [abacus, 1, 6, 210, .7, -7], [receipt, 84, 4, 130, .42, 10],
+        [BOOK3, 84, 56, 220, .8, 14], [coins, 4, 70, 140, .55, 0], [pen, 62, 90, 190, .95, -14]],
+    b: [[folder, 82, 6, 210, .72, 8], [calculator, 2, 18, 170, .78, -12], [chartCard, 40, 2, 120, .2, -8],
+        [magnifier, 86, 60, 170, .55, 18], [book, 4, 70, 190, .62, 12], [stamp, 54, 88, 80, .25, -6]],
+    c: [[stamp, 4, 10, 140, .7, -8], [BOOK2, 80, 10, 220, .78, 12], [coins, 84, 64, 150, .6, 0],
+        [calculator, 1, 58, 160, .74, 16], [receipt, 40, 84, 110, .22, -10], [pen, 56, 4, 150, .3, -12]],
+    head: [[pen, 56, 6, 170, .3, -10], [book, 66, 22, 230, .72, 12], [coins, 64, 64, 130, .55, 0],
+           [calculator, 84, 44, 170, .84, -12], [magnifier, 92, -6, 200, 1, -32]],
   };
 
   function build(panel, scene) {
     const wrap = document.createElement("div"); wrap.className = "floaters"; wrap.setAttribute("aria-hidden", "true");
+    const k = Math.max(.55, Math.min(1.15, innerWidth / 1440));
     SCENES[scene].forEach(([fn, x, y, w, depth, rot], i) => {
+      const blur = depth < .3 ? 2.6 - depth * 4 : depth > .95 ? 3.2 : 0;
+      const img = toImg(fn, Math.round(blur * 10) / 10);
+      const width = w * (.75 + depth * .55) * k;
+      const lift = 10 + depth * 26;                              // высота «над столом» → длина и мягкость тени
       const el = document.createElement("div"); el.className = "flo";
-      const blur = depth < .3 ? 2.2 : depth < .45 ? 1 : 0;
-      el.style.cssText = `left:${x}%;top:${y}%;width:${w * (.7 + depth * .5)}px;--rot:${rot}deg;--dep:${depth};--dur:${(16 + (1 - depth) * 14 + i * 1.3).toFixed(1)}s;--del:${(-i * 2.7).toFixed(1)}s;` +
-        `opacity:${(.35 + depth * .55).toFixed(2)};filter:${blur ? `blur(${blur}px) ` : ""}saturate(${.8 + depth * .3});z-index:${Math.round(depth * 10)}`;
-      el.innerHTML = `<div class="flo-in">${fn("f" + (uid++) + "_")}</div>`;
+      const dur = (14 + (1 - depth) * 10 + i * 1.7).toFixed(1), del = (-i * 3.1).toFixed(1);
+      el.style.cssText = `left:${x}%;top:${y}%;width:${width.toFixed(0)}px;--rot:${rot}deg;--dep:${depth};--dur:${dur}s;--del:${del}s;--lift:${lift.toFixed(0)}px;` +
+        `opacity:${(.55 + depth * .45).toFixed(2)};z-index:${Math.round(depth * 10)}`;
+      el.innerHTML = `<i class="flo-sh" style="filter:blur(${(6 + lift * .35 + blur * 2).toFixed(0)}px)"></i><div class="flo-in"><img src="${img.url}" alt="" decoding="async" draggable="false" style="aspect-ratio:${(1 / img.ratio).toFixed(4)}"></div>`;
       wrap.append(el);
     });
     panel.prepend(wrap);
@@ -238,19 +282,30 @@
   }
 
   const layers = [];
-  document.querySelectorAll(".panel").forEach((p, i) => {
-    let scene = p.dataset.float; if (!scene) return;
-    if (innerWidth < 700) { const keep = scene === "hero" ? 4 : 2; SCENES[scene] = SCENES[scene].slice(0, keep); }
+  document.querySelectorAll(".panel").forEach(p => {
+    const scene = p.dataset.float; if (!scene) return;
+    if (innerWidth < 700) {                                      // на телефоне — по 2–3 предмета у краёв
+      const pick = { hero: [2, 4, 6], a: [1, 3], b: [0, 1], c: [1, 3], head: [1, 3] }[scene];
+      SCENES[scene] = pick.map(i => SCENES[scene][i]).filter(Boolean);
+    }
     layers.push(build(p, scene));
   });
-  if (reduce || !layers.length) return;
+  if (!layers.length) return;
+
+  // анимация только у видимых панелей; вне экрана слои скрыты и не тратят ресурсы
+  const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle("off", !e.isIntersecting)), { rootMargin: "200px 0px" });
+  layers.forEach(w => io.observe(w));
+  document.addEventListener("visibilitychange", () => document.documentElement.classList.toggle("tab-hidden", document.hidden));
+  if (reduce) return;
+
   let mx = 0, my = 0, raf = 0;
+  const items = layers.map(w => ({ w, els: [...w.querySelectorAll(".flo")].map(el => ({ el, d: +el.style.getPropertyValue("--dep") })) }));
   function apply() { raf = 0;
-    layers.forEach(w => { const r = w.getBoundingClientRect(); if (r.bottom < -200 || r.top > innerHeight + 200) return;
-      const off = (r.top + r.height / 2 - innerHeight / 2);
-      w.querySelectorAll(".flo").forEach(el => { const d = +el.style.getPropertyValue("--dep");
-        el.style.transform = `translate3d(${(mx * 40 * d).toFixed(1)}px, ${(-off * .12 * d + my * 30 * d).toFixed(1)}px, 0)`; }); }); }
+    for (const L of items) { if (L.w.classList.contains("off")) continue;
+      const r = L.w.getBoundingClientRect(); const off = r.top + r.height / 2 - innerHeight / 2;
+      for (const { el, d } of L.els) el.style.transform = `translate3d(${(mx * 46 * d).toFixed(1)}px,${(-off * .14 * d + my * 32 * d).toFixed(1)}px,0)`; } }
   addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
-  addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
+  if (matchMedia("(pointer:fine)").matches)
+    addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; if (!raf) raf = requestAnimationFrame(apply); }, { passive: true });
   apply();
 })();

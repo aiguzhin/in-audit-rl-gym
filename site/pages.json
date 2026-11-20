@@ -1,7 +1,7 @@
 {
  "inner": {
   "episode.html": {
-   "num": "03",
+   "num": "04",
    "crumb": "Эпизод",
    "title": "Как рождается<br>эпизод",
    "intro": "Сначала строится согласованная скрытая история компании, и только потом в неё вносятся ошибки. Поэтому эталон описывает реальное расхождение, а не случайную подозрительную строку.",
@@ -22,7 +22,7 @@
    "rest": "\n<div class=\"wrap\">\n  <div class=\"replay\" id=\"replay\" data-r>\n    <div class=\"rp-log\">\n      <div class=\"rp-ctl\"><button class=\"btn\" id=\"play\">▶ Запустить прогон</button><button class=\"btn ghost\" id=\"reset\">Сбросить</button></div>\n      <div class=\"rp-lines\" id=\"lines\"></div>\n    </div>\n    <div class=\"rp-res\" id=\"res\" aria-live=\"polite\"></div>\n  </div>\n</div>"
   },
   "reward.html": {
-   "num": "04",
+   "num": "05",
    "crumb": "Награда",
    "title": "Награда, которую<br>не обмануть",
    "intro": "Награда зависит только от полей и доказательств, текст объяснения на неё не влияет. Сопоставление взаимно однозначное, повтор вывода считается ложным срабатыванием.",

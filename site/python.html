@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python — FinSpector</title>
+<meta name="description" content="Среда, в которой ИИ учится находить ошибки в финансовых книгах: вымышленные компании, скрытые расхождения и честная награда.">
+<meta name="theme-color" content="#0A2246">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Python — FinSpector">
+<meta property="og:description" content="Найдите ошибки в книгах вымышленной компании и получите честный балл от оценщика. Среда для обучения ИИ-аудиторов.">
+<meta property="og:site_name" content="FinSpector">
+<link rel="preload" href="assets/fonts/inter-tight-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2304070D'/%3E%3Cpath d='M16 5v8M16 19v8M5 16h8M19 16h8' stroke='%23A9CBFF' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body data-page="python">
+<a class="skip" href="#main">К содержанию</a>
+<div class="progress"></div>
+<header class="top"><div class="bar">
+  <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>FinSpector</a>
+  <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html">Песочница</a><a href="python.html" class="on" aria-current="page">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a></nav>
+</div></header>
+<main id="main">
+<section class="panel" data-float="head">
+  <div class="grid-lines" aria-hidden="true"><i class="v" style="left:22%"></i><i class="v" style="left:78%"></i><i class="h" style="top:78%"></i><b style="left:22%;top:78%"></b><b style="left:78%;top:78%"></b></div><div class="stars" style="opacity:.5"></div>
+  <div class="wrap page-head">
+    <div class="crumbs"><span class="label"><span class="num">02</span> · Python</span><span class="label">Среда auditenv · прямо в браузере</span></div>
+    <h1 class="title">Код на Python —<br>прямо здесь</h1>
+    <p class="intro" data-r style="--d:3">Та же среда, на которой учатся ИИ-аудиторы, уже установлена в вашем браузере. Выберите пример, поменяйте код и нажмите «Запустить» — ничего ставить не нужно.</p>
+  </div>
+</section>
+<section class="panel"><div class="content"><div class="wrap">
+  <div class="lab-ex" id="lab-ex" role="tablist" aria-label="Примеры"></div>
+  <div class="lab">
+    <div class="glass lab-ed">
+      <div class="lab-bar"><span class="lab-file"><i class="dots"><b></b><b></b><b></b></i><span id="lab-file">01_first_steps.py</span><em id="lab-dirty" hidden>изменено</em></span>
+        <span class="lab-tools"><button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
+      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
+    </div>
+    <div class="glass lab-con">
+      <div class="lab-bar"><button class="btn" id="lab-run" disabled>Запустить <span class="arr">▶</span></button><button type="button" class="chip sm" id="lab-stop" hidden>Остановить</button><span class="kbd">Ctrl + Enter</span><button type="button" class="chip sm" id="lab-clear">Очистить</button></div>
+      <div class="lab-status busy" id="lab-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
+      <pre class="lab-out" id="lab-out" aria-live="polite" tabindex="0">Здесь появится результат.</pre>
+    </div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap">
+  <h2 class="h2" data-r>Шпаргалка по среде</h2>
+  <p class="lead-s" data-r>Агент получает описание компании, делает действия и в конце отправляет выводы. Каждое действие стоит 1 шаг, всего 100 шагов.</p>
+  <div class="api">
+    <div class="glass ac" data-r><span class="label">Начать</span><code>obs, info = env.reset(seed=42)</code><p>Новая компания. В <b>obs["manifest"]</b> — период, валюты, часовой пояс и число записей.</p></div>
+    <div class="glass ac" data-r style="--d:1"><span class="label">Читать таблицу</span><code>{"name": "list_records", "args": {"table": "invoices", "limit": 50}}</code><p>Таблицы: ledger, invoices, payments, fx. Следующая страница — через <b>cursor</b>.</p></div>
+    <div class="glass ac" data-r style="--d:2"><span class="label">Одна запись</span><code>{"name": "get_record", "args": {"table": "payments", "id": "PAY-…"}}</code><p>Или <b>get_document</b> по doc_id — полный счёт или платёж.</p></div>
+    <div class="glass ac" data-r><span class="label">Посчитать</span><code>{"name": "calculator", "args": {"expression": "1250.50 * 0.8015"}}</code><p>Точная десятичная арифметика без ошибок округления.</p></div>
+    <div class="glass ac" data-r style="--d:1"><span class="label">Отправить</span><code>{"name": "submit", "args": {"findings": {"episode_id": …, "findings": [...]}}}</code><p>Вывод: type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation.</p></div>
+    <div class="glass ac" data-r style="--d:2"><span class="label">Ответ среды</span><code>obs, reward, terminated, truncated, info = env.step(action)</code><p>Награда от −1 до +1 приходит после отправки: <b>2·F1 − 1 − 0,002·шаги</b>.</p></div>
+  </div>
+  <div class="types" data-r>
+    <div><b>duplicate_invoice</b><span>Один и тот же счёт выставлен дважды</span></div>
+    <div><b>missing_or_partial_allocation</b><span>Оплата не разнесена или разнесена не полностью</span></div>
+    <div><b>fx_conversion_error</b><span>Неверный курс при пересчёте валюты</span></div>
+    <div><b>period_cutoff_error</b><span>Документ проведён не в своём периоде</span></div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap run">
+  <div>
+    <h2 class="h2" data-r>Запустить у себя</h2>
+    <p class="lead-s" data-r>Нужен только Python 3.11 или новее — сторонних библиотек нет.</p>
+    <pre class="code" data-r><button class="copy" data-copy="git clone https://github.com/aiguzhin/in-audit-rl-gym && cd in-audit-rl-gym && python -m auditenv check">Копировать</button><span class="c"># скачать и проверить всё одной командой</span>
+<span class="p">$ </span>git clone https://github.com/aiguzhin/in-audit-rl-gym
+<span class="p">$ </span>cd in-audit-rl-gym
+<span class="p">$ </span>python -m auditenv check
+
+<span class="c"># примеры с этой страницы</span>
+<span class="p">$ </span>python -m examples.02_find_duplicates
+
+<span class="c"># 10 train + 10 dev эпизодов и траектории</span>
+<span class="p">$ </span>python -m auditenv export
+
+<span class="c"># в контейнере, без сети</span>
+<span class="p">$ </span>docker build -t finspector . && docker run --rm --network none finspector</pre>
+    <div class="dl" data-r><a class="btn" href="download/finspector-auditenv.zip" download>Скачать среду (.zip) <span class="arr">↓</span></a><span>Папка auditenv и примеры · 48 КБ</span></div>
+  </div>
+  <div class="files" data-r style="--d:1">
+    <div><b>auditenv/env.py</b><span>reset / step, 100 шагов, 60 секунд</span></div>
+    <div><b>auditenv/generator.py</b><span>история компании → проводки → ошибки</span></div>
+    <div><b>auditenv/matcher.py</b><span>сопоставление выводов и награда</span></div>
+    <div><b>auditenv/policies.py</b><span>пять политик, включая сверку по открытым правилам</span></div>
+    <div><b>auditenv/reference.py</b><span>независимая сверка эталона</span></div>
+    <div><b>auditenv/server.py</b><span>оценщик в отдельном процессе</span></div>
+    <div><b>examples/</b><span>пять примеров с этой страницы</span></div>
+    <div><b>tests/</b><span>36 тестов среды, оценщика и базовых политик</span></div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap">
+  <h2 class="h2" data-r>Заглянуть глубже</h2>
+  <div class="jury">
+    <a class="glass jl" href="books.html" data-r><span class="k">06</span><b>Книги эпизода</b><span>Настоящие таблицы и эталонные ошибки в режиме оценщика.</span><i>→</i></a>
+    <a class="glass jl" href="run.html" data-r style="--d:1"><span class="k">07</span><b>Прогон политики</b><span>Как алгоритм читает книги шаг за шагом.</span><i>→</i></a>
+    <a class="glass jl" href="policies.html" data-r style="--d:2"><span class="k">08</span><b>Базовые политики</b><span>Пять алгоритмов на 20 закрытых компаниях.</span><i>→</i></a>
+    <a class="glass jl" href="https://github.com/aiguzhin/in-audit-rl-gym" data-r style="--d:3"><span class="k">GH</span><b>Исходный код</b><span>Генератор, среда, оценщик, тесты.</span><i>↗</i></a>
+  </div>
+  <div class="limits">
+    <div data-r><b>Упрощённая модель</b>Только дебиторская задолженность и один отчётный период.</div>
+    <div data-r style="--d:1"><b>Учебные данные</b>Все компании, люди и деньги вымышлены.</div>
+    <div data-r><b>Не реальный аудит</b>Высокая награда не доказывает пригодность для настоящей проверки.</div>
+    <div data-r style="--d:1"><b>Закрытая проверка</b>Для честного рейтинга оценщик использует секретные номера компаний.</div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="wrap"><a class="next" href="leaders.html"><div><span class="label">Дальше</span><div class="t">Лидеры</div></div><span class="go">→</span></a></div></section>
+</main>
+<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<button class="totop" aria-label="Наверх">↑</button>
+<script src="assets/config.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/floaters.js"></script>
+<script src="assets/guide.js"></script>
+<script src="assets/lab.js"></script>
+</body>
+</html>

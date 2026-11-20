@@ -53,13 +53,18 @@
   function onView(el, fn, threshold = .35) { if (!el) return;
     const o = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fn(); o.disconnect(); } }), { threshold }); o.observe(el); }
 
-  // мягкая подсветка карточек за курсором
+  // мягкая подсветка карточки и панели под курсором (обновляем только их — без пересчёта всей страницы)
   if (!reduce && matchMedia("(pointer:fine)").matches) {
-    let raf = 0, ev = null;
+    let raf = 0, ev = null, lastG = null, lastP = null;
+    const set = (el, x, y) => { el.style.setProperty("--mx", x + "px"); el.style.setProperty("--my", y + "px"); };
     addEventListener("pointermove", e => { ev = e; if (raf) return; raf = requestAnimationFrame(() => { raf = 0;
-      document.querySelectorAll(".glass, .panel").forEach(el => { const r = el.getBoundingClientRect();
-        if (ev.clientY < r.top - 300 || ev.clientY > r.bottom + 300) return;
-        el.style.setProperty("--mx", (ev.clientX - r.left) + "px"); el.style.setProperty("--my", (ev.clientY - r.top) + "px"); }); }); }, { passive: true });
+      const t = ev.target instanceof Element ? ev.target : null;
+      const g = t && t.closest(".glass"), p = t && t.closest(".panel");
+      if (lastG && lastG !== g) set(lastG, -999, -999);
+      if (g) { const r = g.getBoundingClientRect(); set(g, ev.clientX - r.left, ev.clientY - r.top); }
+      if (p) { const r = p.getBoundingClientRect(); set(p, ev.clientX - r.left, ev.clientY - r.top); }
+      if (lastP && lastP !== p) set(lastP, -999, -999);
+      lastG = g; lastP = p; }); }, { passive: true });
   }
 
   window.UI = { $, $$, esc, money, typeRu, evAll, countUp, onView, reduce };
