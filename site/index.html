@@ -36,8 +36,6 @@
       <div class="book-stage" aria-hidden="true"><div class="book-glow"></div><div class="book-float"><div class="book3">
       <div class="cover"></div><div class="block l"></div><div class="block r"></div>
       <div class="pg left" id="bpL"></div><div class="pg right" id="bpR"></div>
-      <div class="leaf" style="--d:0s"><div class="pg front" id="bf0"></div><div class="pg back" id="bb0"></div><div class="shade"></div></div>
-      <div class="leaf" style="--d:5s"><div class="pg front" id="bf1"></div><div class="pg back" id="bb1"></div><div class="shade"></div></div>
       <div class="ribbon"></div>
     </div></div></div>
       <div class="hero-right">
@@ -136,9 +134,9 @@
     for (let k = 0; k < 8; k++){ const r = L[(off + k) % L.length]; const v = r.debit_minor || r.credit_minor;
       h += `<div class="hw"><span>${esc(short(r.account))}</span><b>${(r.debit_minor ? "" : "−") + v.toLocaleString("ru-RU")}</b></div>`; }
     return h + `<div class="light"></div><div class="pgn">${n}</div>`; }
-  [["bpL","Журнал"],["bpR","Сверка"],["bf0","Счета"],["bb0","Платежи"],["bf1","Курсы"],["bb1","Итоги"]].forEach(([id, t], i) => {
-    const el = document.getElementById(id); if (el) el.innerHTML = page(i * 7 + 3, t, 41 + i); });
-  $("#bpR").insertAdjacentHTML("beforeend", `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`);
+  const TITLES = ["Журнал", "Сверка", "Счета", "Платежи", "Курсы", "Итоги", "Касса", "Разнесение"];
+  const PEN = `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`;
+  window.BOOK_PAGE = k => { const i = ((k % 400) + 400) % 400; return page(i * 7 + 3, TITLES[i % TITLES.length], 40 + i) + (i % 3 === 2 ? PEN : ""); };
   const B = D.baselines, names = {oracle: "Идеальный ответ", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
   $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
@@ -147,5 +145,6 @@
     el.innerHTML = `Уже <b>${s.runs}</b> прохождений от <b>${s.players}</b> участников · лучший балл <b>${s.best_reward > 0 ? "+" : ""}${s.best_reward.toFixed(3)}</b>`; el.hidden = false; }).catch(() => {});
 })();
 </script>
+<script src="assets/book.js"></script>
 </body>
 </html>

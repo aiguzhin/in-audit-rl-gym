@@ -218,12 +218,15 @@ LAB = """<section class="panel" data-float="head">
   <div class="lab">
     <div class="glass lab-ed">
       <div class="lab-bar"><span class="lab-file"><i class="dots"><b></b><b></b><b></b></i><span id="lab-file">01_first_steps.py</span><em id="lab-dirty" hidden>изменено</em></span>
-        <span class="lab-tools"><button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
-      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
+        <span class="lab-tools"><span class="tpl-wrap"><button type="button" class="chip sm tpl-btn" id="lab-tpl" aria-expanded="false" aria-controls="lab-tpl-menu">Шаблоны ▾</button>
+          <div class="tpl-menu glass" id="lab-tpl-menu" role="menu" hidden><input class="tpl-q" id="lab-tpl-q" placeholder="Найти шаблон…" aria-label="Поиск шаблона"><div class="tpl-list" id="lab-tpl-list"></div><p class="tpl-tip">Шаблон вставится туда, где стоит курсор.</p></div></span>
+          <button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
+      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><div class="lab-errline" id="lab-errline" hidden></div><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
     </div>
     <div class="glass lab-con">
       <div class="lab-bar"><button class="btn" id="lab-run" disabled>Запустить <span class="arr">▶</span></button><button type="button" class="chip sm" id="lab-stop" hidden>Остановить</button><span class="kbd">Ctrl + Enter</span><button type="button" class="chip sm" id="lab-clear">Очистить</button></div>
       <div class="lab-status busy" id="lab-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
+      <div class="lab-help" id="lab-help" hidden></div>
       <pre class="lab-out" id="lab-out" aria-live="polite" tabindex="0">Здесь появится результат.</pre>
     </div>
   </div>
@@ -323,8 +326,6 @@ NOTFOUND = """<section class="panel hero-404" data-float="c">
 BOOK = """<div class="book-stage" aria-hidden="true"><div class="book-glow"></div><div class="book-float"><div class="book3">
       <div class="cover"></div><div class="block l"></div><div class="block r"></div>
       <div class="pg left" id="bpL"></div><div class="pg right" id="bpR"></div>
-      <div class="leaf" style="--d:0s"><div class="pg front" id="bf0"></div><div class="pg back" id="bb0"></div><div class="shade"></div></div>
-      <div class="leaf" style="--d:5s"><div class="pg front" id="bf1"></div><div class="pg back" id="bb1"></div><div class="shade"></div></div>
       <div class="ribbon"></div>
     </div></div></div>"""
 
@@ -429,9 +430,9 @@ INDEX_SCRIPT = r"""<script>
     for (let k = 0; k < 8; k++){ const r = L[(off + k) % L.length]; const v = r.debit_minor || r.credit_minor;
       h += `<div class="hw"><span>${esc(short(r.account))}</span><b>${(r.debit_minor ? "" : "−") + v.toLocaleString("ru-RU")}</b></div>`; }
     return h + `<div class="light"></div><div class="pgn">${n}</div>`; }
-  [["bpL","Журнал"],["bpR","Сверка"],["bf0","Счета"],["bb0","Платежи"],["bf1","Курсы"],["bb1","Итоги"]].forEach(([id, t], i) => {
-    const el = document.getElementById(id); if (el) el.innerHTML = page(i * 7 + 3, t, 41 + i); });
-  $("#bpR").insertAdjacentHTML("beforeend", `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`);
+  const TITLES = ["Журнал", "Сверка", "Счета", "Платежи", "Курсы", "Итоги", "Касса", "Разнесение"];
+  const PEN = `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`;
+  window.BOOK_PAGE = k => { const i = ((k % 400) + 400) % 400; return page(i * 7 + 3, TITLES[i % TITLES.length], 40 + i) + (i % 3 === 2 ? PEN : ""); };
   const B = D.baselines, names = {oracle: "Идеальный ответ", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
   $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
@@ -465,7 +466,7 @@ ZIPKB = round(ZIP.stat().st_size / 1024)
 for f, num, name in PAGES:
     title = "Среда для ИИ-аудиторов" if f == "index.html" else name
     if f == "index.html":
-        body, script = INDEX, INDEX_SCRIPT
+        body, script = INDEX, INDEX_SCRIPT + '\n<script src="assets/book.js"></script>'
     elif f == "leaders.html":
         body, script = LEADERS.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))), '<script src="assets/leaders.js"></script>'
     elif f == "profile.html":
@@ -475,7 +476,7 @@ for f, num, name in PAGES:
         script = '<script src="assets/lessons.js"></script>'
     elif f == "python.html":
         body = LAB.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))).replace("{zipkb}", str(ZIPKB))
-        script = '<script src="assets/lab.js"></script>'
+        script = '<script src="assets/lab.js"></script>\n<script src="assets/lab-help.js"></script>'
     elif f == "play.html":
         body = PLAY.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78))))
         script = '<script src="assets/play.js"></script>'

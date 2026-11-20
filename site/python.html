@@ -36,12 +36,15 @@
   <div class="lab">
     <div class="glass lab-ed">
       <div class="lab-bar"><span class="lab-file"><i class="dots"><b></b><b></b><b></b></i><span id="lab-file">01_first_steps.py</span><em id="lab-dirty" hidden>изменено</em></span>
-        <span class="lab-tools"><button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
-      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
+        <span class="lab-tools"><span class="tpl-wrap"><button type="button" class="chip sm tpl-btn" id="lab-tpl" aria-expanded="false" aria-controls="lab-tpl-menu">Шаблоны ▾</button>
+          <div class="tpl-menu glass" id="lab-tpl-menu" role="menu" hidden><input class="tpl-q" id="lab-tpl-q" placeholder="Найти шаблон…" aria-label="Поиск шаблона"><div class="tpl-list" id="lab-tpl-list"></div><p class="tpl-tip">Шаблон вставится туда, где стоит курсор.</p></div></span>
+          <button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
+      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><div class="lab-errline" id="lab-errline" hidden></div><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
     </div>
     <div class="glass lab-con">
       <div class="lab-bar"><button class="btn" id="lab-run" disabled>Запустить <span class="arr">▶</span></button><button type="button" class="chip sm" id="lab-stop" hidden>Остановить</button><span class="kbd">Ctrl + Enter</span><button type="button" class="chip sm" id="lab-clear">Очистить</button></div>
       <div class="lab-status busy" id="lab-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
+      <div class="lab-help" id="lab-help" hidden></div>
       <pre class="lab-out" id="lab-out" aria-live="polite" tabindex="0">Здесь появится результат.</pre>
     </div>
   </div>
@@ -120,5 +123,6 @@
 <script src="assets/floaters.js"></script>
 <script src="assets/guide.js"></script>
 <script src="assets/lab.js"></script>
+<script src="assets/lab-help.js"></script>
 </body>
 </html>
