@@ -66,7 +66,7 @@
   const gb = document.createElement("button"); gb.className = "guide-btn"; gb.type = "button"; gb.innerHTML = '<span aria-hidden="true">?</span>Гид';
   gb.setAttribute("aria-label", "Запустить гид по странице"); gb.onclick = startTour;
   const bar = $("header.top .bar"); if (bar) bar.insertBefore(gb, $(".burger")); gb.title = "Гид по странице";
-  if (!store.get("fa-tour-" + page) && (page === "index" || page === "play") && !new URLSearchParams(location.search).get("daily")) setTimeout(startTour, 1800);
+  if (!document.body.classList.contains("gated") && !store.get("fa-tour-" + page) && (page === "index" || page === "play") && !new URLSearchParams(location.search).get("daily")) setTimeout(startTour, 1800);
 
   // ================================================================ ПОМОЩНИК
   const KB = [

@@ -6,6 +6,7 @@
   GET  /api/health
   POST /api/register   {username, password, display?}      -> {token, user}
   POST /api/login      {username, password}                -> {token, user}
+  GET  /api/check-username?u=логин                        -> {valid, available}
   GET  /api/me         (Authorization: Bearer <token>)     -> профиль, статистика, история, достижения
   GET  /api/daily                                          -> номер «компании дня»
   GET  /api/leaderboard?limit=20&scope=all|daily
@@ -198,6 +199,16 @@ def register(body: dict, ip: str) -> dict:
     return {"token": make_token(row[0]), "user": user_public(row)}
 
 
+def check_username(username: str, ip: str) -> dict:
+    """Свободен ли логин — для подсказки прямо при вводе на форме регистрации."""
+    rate("chk:" + ip, 60)
+    u = str(username or "").strip().lower()
+    if not USER_RE.match(u):
+        return {"username": u, "valid": False, "available": False}
+    taken = bool(get_db().exec("SELECT 1 FROM users WHERE username = ?", (u,), fetch=True))
+    return {"username": u, "valid": True, "available": not taken}
+
+
 def login(body: dict, ip: str) -> dict:
     rate("auth:" + ip, 8)
     username = str(body.get("username", "")).strip().lower()
@@ -380,6 +391,7 @@ class Handler(BaseHTTPRequestHandler):
             "/api/stats": stats,
             "/api/daily": lambda: {"day": today(), "seed": daily_seed(), "preset": "mixed"},
             "/api/leaderboard": lambda: leaderboard(int(q.get("limit", ["20"])[0]), q.get("scope", ["all"])[0]),
+            "/api/check-username": lambda: check_username(q.get("u", [""])[0], self._ip()),
         }
         if u.path in routes:
             return self._handle(routes[u.path])

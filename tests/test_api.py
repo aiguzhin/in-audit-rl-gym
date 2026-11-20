@@ -95,3 +95,13 @@ class TestAPI(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestUsernameCheck(TestAPI):
+    def test_check_username(self):
+        c, r = self.req("/api/check-username?u=Free_Name")
+        self.assertEqual((c, r["valid"], r["available"], r["username"]), (200, True, True, "free_name"))
+        self.req("/api/register", {"username": "taken_1", "password": "secret-123"})
+        self.assertFalse(self.req("/api/check-username?u=taken_1")[1]["available"])
+        bad = self.req("/api/check-username?u=ab")[1]
+        self.assertFalse(bad["valid"])
