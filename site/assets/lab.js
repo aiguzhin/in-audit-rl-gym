@@ -17,8 +17,20 @@
   const ed = $("#lab-code"), gut = $("#lab-gutter"), out = $("#lab-out"), st = $("#lab-status"), runB = $("#lab-run"), stopB = $("#lab-stop");
 
   function status(html, kind) { st.className = "lab-status " + (kind || ""); st.innerHTML = html; }
-  function lines() { const n = ed.value.split("\n").length; let s = ""; for (let i = 1; i <= n; i++) s += i + "\n"; const bad = +gut.dataset.bad || 0;
-    gut.innerHTML = bad ? s.split("\n").map((x, i) => i + 1 === bad ? `<b>${x}</b>` : x).join("\n") : s; gut.scrollTop = ed.scrollTop; }
+  // Нумерация строк с учётом переноса: невидимое «зеркало» измеряет высоту каждой строки кода.
+  const mirror = document.createElement("div"); mirror.className = "lab-mirror"; mirror.setAttribute("aria-hidden", "true"); ed.parentNode.append(mirror);
+  let H = [];                                          // высота каждой логической строки в пикселях
+  function lines() {
+    const ls = ed.value.split("\n"), cs = getComputedStyle(ed);
+    mirror.style.width = (ed.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) + "px";
+    mirror.innerHTML = ls.map(x => `<div>${x ? esc(x) : "&nbsp;"}</div>`).join("");
+    H = [...mirror.children].map(d => d.offsetHeight);
+    const bad = +gut.dataset.bad || 0;
+    gut.innerHTML = H.map((h, i) => `<div style="height:${h}px"${i + 1 === bad ? ' class="bad"' : ""}>${i + 1}</div>`).join("");
+    gut.scrollTop = ed.scrollTop;
+  }
+  window.LAB_LINES = { top: n => 16 + H.slice(0, n - 1).reduce((a, b) => a + b, 0), height: n => H[n - 1] || 23, redraw: () => lines() };
+  addEventListener("resize", () => lines());
   function write(s, cls) { const span = document.createElement("span"); if (cls) span.className = cls; span.textContent = s; out.append(span); out.scrollTop = out.scrollHeight; }
 
   // ---------------------------------------------------------------- поток Python

@@ -133,38 +133,45 @@ for seed in range(1, 6):
 print(f"Среднее: {total / 5:+.3f}")
 `],
   ];
-  const menu = $("#lab-tpl-menu"), btn = $("#lab-tpl"), list = $("#lab-tpl-list"), q = $("#lab-tpl-q");
+  const menu = $("#lab-tpl-menu"), btn = $("#lab-tpl"), list = $("#lab-tpl-list"), q = $("#lab-tpl-q"), pv = $("#lab-tpl-pv"), pvT = $("#lab-tpl-name");
+  let sel = 0;
   function draw() {
-    const s = q.value.trim().toLowerCase(); let g = "", out = "";
+    const s = q.value.trim().toLowerCase(); let g = "", out = "", first = -1;
     T.forEach(([grp, name, code], i) => {
       if (s && !(name + " " + grp + " " + code).toLowerCase().includes(s)) return;
+      if (first < 0) first = i;
       if (grp !== g) { out += `<div class="tpl-g">${grp}</div>`; g = grp; }
-      out += `<button type="button" role="menuitem" class="tpl-i" data-i="${i}"><b>${name}</b><code>${esc(code.split("\n").find(l => l.trim() && !l.trim().startsWith("#")) || "")}</code></button>`;
+      out += `<button type="button" role="option" class="tpl-i" data-i="${i}" aria-selected="false">${name}</button>`;
     });
     list.innerHTML = out || `<p class="tpl-tip">Ничего не нашлось.</p>`;
+    if (first >= 0) pick(list.querySelector(`[data-i="${sel}"]`) ? sel : first); else { pv.textContent = ""; pvT.textContent = ""; }
   }
+  function pick(i) { sel = i; list.querySelectorAll(".tpl-i").forEach(b => b.setAttribute("aria-selected", +b.dataset.i === i)); pvT.textContent = T[i][1]; pv.textContent = T[i][2].replace(/\n$/, ""); }
   let caret = 0;
-  function open(on) { menu.hidden = !on; btn.setAttribute("aria-expanded", on); if (on) { caret = ed.selectionStart; q.value = ""; draw(); q.focus(); } }
+  function open(on) { if (on) menu.style.top = (menu.parentNode.querySelector(".lab-bar").offsetHeight + 8) + "px"; menu.hidden = !on; btn.setAttribute("aria-expanded", on); if (on) { caret = ed.selectionStart; q.value = ""; draw(); q.focus(); } }
   btn.onclick = () => open(menu.hidden);
+  $("#lab-tpl-close").onclick = () => { open(false); btn.focus(); };
   q.oninput = draw;
   menu.addEventListener("keydown", e => {
-    if (e.key === "Escape") { open(false); btn.focus(); }
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const items = [...list.querySelectorAll(".tpl-i")]; const i = items.indexOf(document.activeElement);
-      const n = e.key === "ArrowDown" ? Math.min(items.length - 1, i + 1) : Math.max(-1, i - 1); (n < 0 ? q : items[n]).focus(); }
-    if (e.key === "Enter" && document.activeElement === q) { const f = list.querySelector(".tpl-i"); if (f) { e.preventDefault(); f.click(); } }
+    if (e.key === "Escape") { open(false); btn.focus(); return; }
+    const items = [...list.querySelectorAll(".tpl-i")], k = items.findIndex(b => +b.dataset.i === sel);
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const n = items[Math.max(0, Math.min(items.length - 1, k + (e.key === "ArrowDown" ? 1 : -1)))]; if (n) { pick(+n.dataset.i); n.scrollIntoView({ block: "nearest" }); } }
+    if (e.key === "Enter" && (document.activeElement === q || document.activeElement.classList.contains("tpl-i"))) { e.preventDefault(); insert(sel); }
   });
-  document.addEventListener("click", e => { if (!menu.hidden && !e.target.closest(".tpl-wrap")) open(false); });
-  list.addEventListener("click", e => {
-    const b = e.target.closest(".tpl-i"); if (!b) return;
-    const code = T[+b.dataset.i][2], v = ed.value;
+  document.addEventListener("click", e => { if (!menu.hidden && !e.target.closest("#lab-tpl-menu") && !e.target.closest("#lab-tpl")) open(false); });
+  list.addEventListener("click", e => { const b = e.target.closest(".tpl-i"); if (b) pick(+b.dataset.i); });
+  list.addEventListener("dblclick", e => { const b = e.target.closest(".tpl-i"); if (b) insert(+b.dataset.i); });
+  $("#lab-tpl-ins").onclick = () => insert(sel);
+  function insert(i) {
+    const code = T[i][2], v = ed.value;
     const ls = v.lastIndexOf("\n", caret - 1) + 1, cur = v.slice(ls, caret), ind = (/^ */.exec(cur) || [""])[0];
     const atStart = cur.trim() === "";
     const text = (atStart ? "" : "\n" + ind) + code.replace(/\n(?=.)/g, "\n" + ind).replace(/\n$/, "") + "\n";
-    ed.focus(); ed.setSelectionRange(atStart ? ls + ind.length : caret, caret);
+    open(false); ed.focus(); ed.setSelectionRange(atStart ? ls + ind.length : caret, caret);
     ed.setRangeText(atStart ? text.replace(/^ */, "") : text, ed.selectionStart, ed.selectionEnd, "end");
-    ed.dispatchEvent(new Event("input")); open(false);
-    toast(`Вставлен шаблон «${T[+b.dataset.i][1]}»`);
-  });
+    ed.dispatchEvent(new Event("input"));
+    toast(`Вставлен шаблон «${T[i][1]}»`);
+  }
 
   // ---------------------------------------------------------------- ошибки: строка + объяснение
   const EXPLAIN = [
@@ -190,13 +197,13 @@ print(f"Среднее: {total / 5:+.3f}")
   const errLine = $("#lab-errline"), help = $("#lab-help");
   const LH = () => parseFloat(getComputedStyle(ed).lineHeight) || 23;
   let errAt = 0;
-  function place() { if (!errAt) return; const top = 16 + (errAt - 1) * LH() - ed.scrollTop; errLine.style.transform = `translateY(${top}px)`; errLine.style.height = LH() + "px"; errLine.hidden = top < -LH() || top > ed.clientHeight; }
+  function place() { if (!errAt) return; const top = LAB_LINES.top(errAt) - ed.scrollTop, hh = LAB_LINES.height(errAt);
+    errLine.style.transform = `translateY(${top}px)`; errLine.style.height = hh + "px"; errLine.hidden = top < -hh || top > ed.clientHeight; }
   ed.addEventListener("scroll", place);
-  function clear() { errAt = 0; errLine.hidden = true; help.hidden = true; const g = $("#lab-gutter"); g.dataset.bad = ""; g.textContent = g.textContent; }
-  function markGutter(n) { const g = $("#lab-gutter"); g.dataset.bad = n || ""; if (!n) return;
-    g.innerHTML = g.textContent.split("\n").map((s, i) => i + 1 === n ? `<b>${s}</b>` : s).join("\n"); }
+  function clear() { errAt = 0; errLine.hidden = true; help.hidden = true; $("#lab-gutter").dataset.bad = ""; LAB_LINES.redraw(); }
+  function markGutter(n) { $("#lab-gutter").dataset.bad = n || ""; LAB_LINES.redraw(); }
   function goto(n) { const lines = ed.value.split("\n"); let pos = 0; for (let i = 0; i < n - 1; i++) pos += lines[i].length + 1;
-    ed.focus(); ed.setSelectionRange(pos, pos + (lines[n - 1] || "").length); const top = (n - 3) * LH(); ed.scrollTop = Math.max(0, top); place(); }
+    ed.focus(); ed.setSelectionRange(pos, pos + (lines[n - 1] || "").length); ed.scrollTop = Math.max(0, LAB_LINES.top(n) - 16 - 2 * LAB_LINES.height(1)); place(); }
   window.LAB_HELP = {
     report(text) {
       const lines = text.trim().split("\n"), last = lines[lines.length - 1] || "";

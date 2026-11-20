@@ -34,14 +34,11 @@
       s.querySelector(".b .pw").style.cssText = `width:${w}px;left:${-(N - 1 - i) * w / N}px`;
     });
   }
-  function fill() {                                   // содержимое страниц разворота n
-    L.querySelectorAll(":scope > :not(.cast)").forEach(x => x.remove());
-    R.querySelectorAll(":scope > :not(.cast)").forEach(x => x.remove());
-    L.insertAdjacentHTML("afterbegin", BOOK_PAGE(2 * n - 1));
-    R.insertAdjacentHTML("afterbegin", BOOK_PAGE(2 * n + 2));   // под листом — следующая правая страница
-    const fh = BOOK_PAGE(2 * n), bh = BOOK_PAGE(2 * n + 1);
-    fronts.forEach(p => p.innerHTML = fh); backs.forEach(p => p.innerHTML = bh);
-  }
+  const put = (el, html) => { if (el._h !== html) { el._h = html; el.innerHTML = html; } };
+  const setPage = (P, k) => { const h = BOOK_PAGE(k); if (P._h === h) return; P._h = h; P.querySelectorAll(":scope > :not(.cast)").forEach(x => x.remove()); P.insertAdjacentHTML("afterbegin", h); };
+  const setLeaf = () => { const fh = BOOK_PAGE(2 * n), bh = BOOK_PAGE(2 * n + 1); fronts.forEach(p => put(p, fh)); backs.forEach(p => put(p, bh)); };
+  function fill() { setPage(L, 2 * n - 1); setPage(R, 2 * n + 2); setLeaf(); }
+
 
   // ---------- физика ----------
   const K = 210, C = 10.5, G = 1100, INERTIA = 2.6, TURN = 1.9, REST = 2.6, SETTLE = 1.6;
@@ -63,8 +60,8 @@
       const a = -K * rho[i] - C * vel[i] + g - INERTIA * acc * mass(i) * .08;
       vel[i] += a * dt; rho[i] += vel[i] * dt;
       let t = cum + rho[i];
-      if (t < .4) { rho[i] = .4 - cum; if (vel[i] < 0) vel[i] *= -.15; t = .4; }        // не проходит сквозь правую страницу
-      if (t > 179.6) { rho[i] = 179.6 - cum; if (vel[i] > 0) vel[i] *= -.15; t = 179.6; } // и сквозь левую
+      if (t < 0) { rho[i] = -cum; if (vel[i] < 0) vel[i] = 0; t = 0; }              // не проходит сквозь правую страницу — ложится на неё
+      if (t > 180) { rho[i] = 180 - cum; if (vel[i] > 0) vel[i] = 0; t = 180; }      // и сквозь левую
       cum = t;
     }
   }
@@ -87,20 +84,38 @@
     castL.style.opacity = (base >= 90 ? lift * .55 : 0).toFixed(3);
   }
 
+  // Смена разворота без рывка: под лёгшим листом уже та же страница → лист плавно растворяется,
+  // возвращается направо (там под ним та же страница) и плавно проявляется. Глаз не видит подмены.
+  function swap() {
+    phase = "swap"; setPage(L, 2 * n + 1);
+    leaf.style.opacity = "0";
+    setTimeout(() => {
+      n++; base = 0; baseV = 0; rho.fill(0); vel.fill(0); setLeaf(); render();
+      leaf.style.opacity = "1";
+      setTimeout(() => { setPage(R, 2 * n + 2); phase = "rest"; t0 = performance.now(); }, 260);
+    }, 260);
+  }
   let raf = 0, visible = true, last = performance.now();
   function frame(now) {
     raf = 0;
-    let dt = Math.min(.05, (now - last) / 1000); last = now;
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
     const el = (now - t0) / 1000;
-    if (phase === "rest" && el > REST) { phase = "turn"; t0 = now; }
-    else if (phase === "turn" && el > TURN) { phase = "settle"; t0 = now; }
-    else if (phase === "settle" && (el > SETTLE || (el > .45 && Math.min(...theta) > 178.5 && Math.max(...vel.map(Math.abs)) < 25))) {                     // лист лёг: незаметно переносим его направо со следующими страницами
-      phase = "rest"; t0 = now; n++; base = 0; baseV = 0; rho.fill(0); vel.fill(0); fill();
+    if (phase === "swap") { /* ждём завершения плавной подмены */ }
+    else if (phase === "rest") {                                          // лист лежит: ничего не считаем и не перерисовываем — никакой дрожи
+      if (el > REST) { phase = "turn"; t0 = now; }
+    } else {
+      if (phase === "turn" && el > TURN) { phase = "settle"; t0 = now; }
+      const tt = (now - t0) / 1000;
+      const sub = Math.max(1, Math.ceil(dt / (1 / 240)));
+      for (let k = 0; k < sub; k++) step(dt / sub, tt - dt + (k + 1) * dt / sub);
+      render();
+      if (phase === "settle") {
+        let still = true; for (let i = 1; i < N; i++) if (Math.abs(vel[i]) > 12 || theta[i] < 179.2) still = false;
+        if ((still && tt > .35) || tt > SETTLE) {                     // лист лёг ровно — незаметно переносим его направо со следующими страницами
+          swap();
+        }
+      }
     }
-    const tt = (now - t0) / 1000;
-    const sub = Math.max(1, Math.ceil(dt / (1 / 240)));
-    for (let k = 0; k < sub; k++) step(dt / sub, tt - dt + (k + 1) * dt / sub);
-    render();
     if (visible && !document.hidden) raf = requestAnimationFrame(frame);
   }
   function start() { if (!raf && visible && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } }

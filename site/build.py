@@ -218,10 +218,15 @@ LAB = """<section class="panel" data-float="head">
   <div class="lab">
     <div class="glass lab-ed">
       <div class="lab-bar"><span class="lab-file"><i class="dots"><b></b><b></b><b></b></i><span id="lab-file">01_first_steps.py</span><em id="lab-dirty" hidden>изменено</em></span>
-        <span class="lab-tools"><span class="tpl-wrap"><button type="button" class="chip sm tpl-btn" id="lab-tpl" aria-expanded="false" aria-controls="lab-tpl-menu">Шаблоны ▾</button>
-          <div class="tpl-menu glass" id="lab-tpl-menu" role="menu" hidden><input class="tpl-q" id="lab-tpl-q" placeholder="Найти шаблон…" aria-label="Поиск шаблона"><div class="tpl-list" id="lab-tpl-list"></div><p class="tpl-tip">Шаблон вставится туда, где стоит курсор.</p></div></span>
+        <span class="lab-tools"><button type="button" class="chip sm tpl-btn" id="lab-tpl" aria-expanded="false" aria-controls="lab-tpl-menu">Шаблоны ▾</button>
           <button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
-      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><div class="lab-errline" id="lab-errline" hidden></div><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
+      <div class="tpl-menu" id="lab-tpl-menu" role="dialog" aria-label="Шаблоны кода" hidden>
+        <div class="tpl-left"><input class="tpl-q" id="lab-tpl-q" placeholder="Найти шаблон…" aria-label="Поиск шаблона"><div class="tpl-list" id="lab-tpl-list" role="listbox" aria-label="Шаблоны"></div></div>
+        <div class="tpl-right"><div class="tpl-head"><b id="lab-tpl-name"></b><button type="button" class="chip sm" id="lab-tpl-close" aria-label="Закрыть шаблоны">Закрыть</button></div>
+          <pre class="tpl-pv" id="lab-tpl-pv"></pre>
+          <div class="tpl-foot"><button type="button" class="btn plain" id="lab-tpl-ins">Вставить в код</button><span>Вставится туда, где стоит курсор. Двойной клик или Enter — сразу вставить.</span></div></div>
+      </div>
+      <div class="lab-code"><div id="lab-gutter" class="lab-gutter" aria-hidden="true"></div><div class="lab-errline" id="lab-errline" hidden></div><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
     </div>
     <div class="glass lab-con">
       <div class="lab-bar"><button class="btn" id="lab-run" disabled>Запустить <span class="arr">▶</span></button><button type="button" class="chip sm" id="lab-stop" hidden>Остановить</button><span class="kbd">Ctrl + Enter</span><button type="button" class="chip sm" id="lab-clear">Очистить</button></div>

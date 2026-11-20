@@ -856,7 +856,7 @@ pre.code .copy{position:absolute;top:14px;right:14px}
 .hint-ids{display:flex;flex-wrap:wrap;gap:6px 12px;margin:6px 0}
 
 /* ===== живой лист книги (полосы + физика в book.js) ===== */
-.book3 .leaf2{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-style:preserve-3d;pointer-events:none}
+.book3 .leaf2{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-style:preserve-3d;pointer-events:none;transition:opacity .24s ease}
 .book3 .leaf2 .st{position:absolute;top:0;bottom:0;left:100%;width:100%;transform-style:preserve-3d;transform-origin:0 50%;will-change:transform}
 .book3 .leaf2 .st0{left:0;width:calc(100% / 12)}
 .book3 .leaf2 .fc{position:absolute;top:0;bottom:0;left:0;width:calc(100% + .7px);backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(.01px)}
@@ -875,17 +875,25 @@ pre.code .copy{position:absolute;top:14px;right:14px}
 .book3 .ribbon{left:49.2%;width:1.6%;top:auto;bottom:-14%;height:30%;transform:translateZ(.6px)}
 
 /* ===== помощник Python-редактора ===== */
-.tpl-wrap{position:relative}
 .tpl-btn{background:rgba(74,144,255,.16);border-color:rgba(74,144,255,.45)}
-.tpl-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:min(420px,86vw);max-height:460px;display:flex;flex-direction:column;padding:10px;background:#0B1428!important;box-shadow:0 24px 60px -10px rgba(0,0,0,.85)}
-.tpl-q{font:500 14px var(--sans);color:var(--text);background:rgba(0,0,0,.4);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;outline:none}
+.lab-ed{position:relative}
+.tpl-menu{position:absolute;left:10px;right:10px;top:62px;bottom:10px;z-index:30;display:grid;grid-template-columns:minmax(200px,250px) minmax(0,1fr);gap:12px;padding:12px;border-radius:16px;
+  background:#0B1428;border:1px solid rgba(169,203,255,.28);box-shadow:0 24px 60px -10px rgba(0,0,0,.85)}
+.tpl-menu[hidden]{display:none}
+.tpl-left{display:flex;flex-direction:column;min-height:0;gap:8px}
+.tpl-q{font:500 14px var(--sans);color:var(--text);background:rgba(0,0,0,.4);border:1px solid var(--glass-b);border-radius:10px;padding:10px 12px;outline:none;width:100%}
 .tpl-q:focus{border-color:var(--blue)}
-.tpl-list{overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:2px}
-.tpl-g{font:500 11.5px var(--sans);color:var(--dim);padding:10px 8px 4px}
-.tpl-i{display:flex;flex-direction:column;gap:3px;text-align:left;padding:9px 10px;border-radius:10px;border:0;background:none;color:var(--text);cursor:pointer}
-.tpl-i:hover,.tpl-i:focus-visible{background:rgba(74,144,255,.14);outline:none}
-.tpl-i b{font:500 14px var(--sans)}.tpl-i code{font:12px var(--mono);color:var(--muted);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tpl-tip{font-size:12px;color:var(--dim);padding:8px 8px 2px}
+.tpl-list{overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:2px;min-height:0;padding-right:4px}
+.tpl-g{font:500 12px var(--sans);color:var(--dim);padding:10px 10px 4px}
+.tpl-i{text-align:left;padding:9px 10px;border-radius:10px;border:0;background:none;color:var(--text);cursor:pointer;font:500 14px/1.3 var(--sans);white-space:normal}
+.tpl-i:hover{background:rgba(74,144,255,.1)}
+.tpl-i[aria-selected=true]{background:rgba(74,144,255,.2);box-shadow:inset 3px 0 0 var(--blue-2)}
+.tpl-right{display:flex;flex-direction:column;min-width:0;min-height:0;gap:10px}
+.tpl-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.tpl-head b{font:600 16px var(--sans)}
+.tpl-pv{flex:1;min-height:0;margin:0;overflow-y:auto;overflow-x:hidden;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.65 var(--mono);color:#DCE6F8;background:#02050A;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px}
+.tpl-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.tpl-foot span{font-size:12.5px;color:var(--dim);flex:1;min-width:180px}
+.tpl-tip{font-size:12.5px;color:var(--dim);padding:8px}
+@media(max-width:700px){.tpl-menu{grid-template-columns:1fr;grid-template-rows:auto minmax(120px,40%) 1fr}.tpl-left{display:contents}.tpl-list{max-height:none}}
 .lab-errline{position:absolute;left:0;right:0;top:0;background:rgba(255,110,100,.14);box-shadow:inset 3px 0 0 #FF7A6E;pointer-events:none;z-index:0;transition:transform .15s}
 .lab-code textarea{position:relative;z-index:1}
 #lab-gutter b{color:#FF9C9C;font-weight:700}
@@ -896,3 +904,18 @@ pre.code .copy{position:absolute;top:14px;right:14px}
 .lab-help p{font-size:14px;line-height:1.5;color:#E6ECF8}
 .lab-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:300;background:#fff;color:#05080F;font:500 14px var(--sans);padding:11px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.25s var(--ease);pointer-events:none}
 .lab-toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* перенос длинных строк в редакторе — без горизонтальной прокрутки */
+.lab-code textarea{white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:normal;overflow-x:hidden!important}
+.lab-gutter{width:46px;flex:none;text-align:right;padding:16px 12px 16px 0;color:#3E4C66;overflow:hidden;user-select:none;border-right:1px solid rgba(255,255,255,.05);font:13.5px/1.7 var(--mono)}
+.lab-gutter div{line-height:1.7}.lab-gutter .bad{color:#FF9C9C;font-weight:700}
+.lab-mirror{position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;font:13.5px/1.7 var(--mono);tab-size:4}
+.lab-out{overflow-x:hidden}
+@media(max-width:640px){.lab-gutter{width:36px;padding-right:8px}}
+
+/* в живой книге пометка ручкой уже нарисована — без перезапуска анимации при смене страниц */
+.book3 .pg .pen path{animation:none;stroke-dashoffset:0}
+.book3 .leaf2 .fc .pg,.book3 .pg.left,.book3 .pg.right{box-shadow:inset 34px 0 30px -24px rgba(20,30,50,.5)}
+.book3 .leaf2 .fc.b .pg,.book3 .pg.left{box-shadow:inset -34px 0 30px -24px rgba(20,30,50,.5)}
+.book3 .leaf2 .pg{padding:14% 13% 12%}
+@media(max-width:640px){.lab-ed .lab-bar .lab-file{flex:1 1 100%}.lab-tools{flex-wrap:wrap}}
