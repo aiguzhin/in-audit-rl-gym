@@ -12,19 +12,19 @@ INNER, SCRIPT = PARTS["inner"], PARTS["scripts"]
 PAGES = [
     ("index.html", "00", "Главная"),
     ("play.html", "01", "Песочница"),
-    ("leaders.html", "02", "Лидеры"),
-    ("episode.html", "03", "Как устроено"),
-    ("reward.html", "04", "Награда"),
-    ("start.html", "05", "Для жюри"),
+    ("python.html", "02", "Python"),
+    ("leaders.html", "03", "Лидеры"),
+    ("episode.html", "04", "Как устроено"),
+    ("reward.html", "05", "Награда"),
     ("books.html", "06", "Книги эпизода"),
     ("run.html", "07", "Прогон политики"),
     ("policies.html", "08", "Базовые политики"),
     ("profile.html", "09", "Профиль"),
 ]
-NAV = ["play.html", "leaders.html", "episode.html", "reward.html", "start.html"]
-NEXT = {"index.html": "play.html", "play.html": "leaders.html", "leaders.html": "episode.html", "episode.html": "reward.html",
-        "reward.html": "start.html", "start.html": "play.html", "books.html": "run.html", "run.html": "policies.html",
-        "policies.html": "start.html", "profile.html": "play.html"}
+NAV = ["play.html", "python.html", "leaders.html", "episode.html", "reward.html"]
+NEXT = {"index.html": "play.html", "play.html": "python.html", "python.html": "leaders.html", "leaders.html": "episode.html",
+        "episode.html": "reward.html", "reward.html": "play.html", "books.html": "run.html", "run.html": "policies.html",
+        "policies.html": "python.html", "profile.html": "play.html"}
 
 LOGO = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">'
         '<path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>')
@@ -75,7 +75,7 @@ def nav(active):
     names = {f: n for f, _, n in PAGES}
     out = []
     for f in NAV:
-        on = f == active or (f == "start.html" and active in ("books.html", "run.html", "policies.html"))
+        on = f == active or (f == "python.html" and active in ("books.html", "run.html", "policies.html"))
         cur = ' class="on" aria-current="page"' if on else ""
         out.append(f'<a href="{f}"{cur}>{names[f]}</a>')
     return "".join(out)
@@ -183,10 +183,99 @@ PLAY = """<section class="panel" data-float="head">
 </div></div></section>
 """
 
+LAB = """<section class="panel" data-float="head">
+  {grid}<div class="stars" style="opacity:.5"></div>
+  <div class="wrap page-head">
+    <div class="crumbs"><span class="label"><span class="num">02</span> · Python</span><span class="label">Среда auditenv · прямо в браузере</span></div>
+    <h1 class="title">Код на Python —<br>прямо здесь</h1>
+    <p class="intro" data-r style="--d:3">Та же среда, на которой учатся ИИ-аудиторы, уже установлена в вашем браузере. Выберите пример, поменяйте код и нажмите «Запустить» — ничего ставить не нужно.</p>
+  </div>
+</section>
+<section class="panel"><div class="content"><div class="wrap">
+  <div class="lab-ex" id="lab-ex" role="tablist" aria-label="Примеры"></div>
+  <div class="lab">
+    <div class="glass lab-ed">
+      <div class="lab-bar"><span class="lab-file"><i class="dots"><b></b><b></b><b></b></i><span id="lab-file">01_first_steps.py</span><em id="lab-dirty" hidden>изменено</em></span>
+        <span class="lab-tools"><button type="button" class="chip sm" id="lab-reset" title="Вернуть исходный код примера">Сбросить</button><button type="button" class="chip sm" id="lab-copy">Копировать</button></span></div>
+      <div class="lab-code"><pre id="lab-gutter" aria-hidden="true">1</pre><textarea id="lab-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Код на Python"></textarea></div>
+    </div>
+    <div class="glass lab-con">
+      <div class="lab-bar"><button class="btn" id="lab-run" disabled>Запустить <span class="arr">▶</span></button><button type="button" class="chip sm" id="lab-stop" hidden>Остановить</button><span class="kbd">Ctrl + Enter</span><button type="button" class="chip sm" id="lab-clear">Очистить</button></div>
+      <div class="lab-status busy" id="lab-status" role="status" aria-live="polite"><span class="spin"></span>Загружаем Python…</div>
+      <pre class="lab-out" id="lab-out" aria-live="polite" tabindex="0">Здесь появится результат.</pre>
+    </div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap">
+  <h2 class="h2" data-r>Шпаргалка по среде</h2>
+  <p class="lead-s" data-r>Агент получает описание компании, делает действия и в конце отправляет выводы. Каждое действие стоит 1 шаг, всего 100 шагов.</p>
+  <div class="api">
+    <div class="glass ac" data-r><span class="label">Начать</span><code>obs, info = env.reset(seed=42)</code><p>Новая компания. В <b>obs["manifest"]</b> — период, валюты, часовой пояс и число записей.</p></div>
+    <div class="glass ac" data-r style="--d:1"><span class="label">Читать таблицу</span><code>{"name": "list_records", "args": {"table": "invoices", "limit": 50}}</code><p>Таблицы: ledger, invoices, payments, fx. Следующая страница — через <b>cursor</b>.</p></div>
+    <div class="glass ac" data-r style="--d:2"><span class="label">Одна запись</span><code>{"name": "get_record", "args": {"table": "payments", "id": "PAY-…"}}</code><p>Или <b>get_document</b> по doc_id — полный счёт или платёж.</p></div>
+    <div class="glass ac" data-r><span class="label">Посчитать</span><code>{"name": "calculator", "args": {"expression": "1250.50 * 0.8015"}}</code><p>Точная десятичная арифметика без ошибок округления.</p></div>
+    <div class="glass ac" data-r style="--d:1"><span class="label">Отправить</span><code>{"name": "submit", "args": {"findings": {"episode_id": …, "findings": [...]}}}</code><p>Вывод: type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation.</p></div>
+    <div class="glass ac" data-r style="--d:2"><span class="label">Ответ среды</span><code>obs, reward, terminated, truncated, info = env.step(action)</code><p>Награда от −1 до +1 приходит после отправки: <b>2·F1 − 1 − 0,002·шаги</b>.</p></div>
+  </div>
+  <div class="types" data-r>
+    <div><b>duplicate_invoice</b><span>Один и тот же счёт выставлен дважды</span></div>
+    <div><b>missing_or_partial_allocation</b><span>Оплата не разнесена или разнесена не полностью</span></div>
+    <div><b>fx_conversion_error</b><span>Неверный курс при пересчёте валюты</span></div>
+    <div><b>period_cutoff_error</b><span>Документ проведён не в своём периоде</span></div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap run">
+  <div>
+    <h2 class="h2" data-r>Запустить у себя</h2>
+    <p class="lead-s" data-r>Нужен только Python 3.11 или новее — сторонних библиотек нет.</p>
+    <pre class="code" data-r><button class="copy" data-copy="git clone https://github.com/aiguzhin/in-audit-rl-gym && cd in-audit-rl-gym && python -m auditenv check">Копировать</button><span class="c"># скачать и проверить всё одной командой</span>
+<span class="p">$ </span>git clone https://github.com/aiguzhin/in-audit-rl-gym
+<span class="p">$ </span>cd in-audit-rl-gym
+<span class="p">$ </span>python -m auditenv check
+
+<span class="c"># примеры с этой страницы</span>
+<span class="p">$ </span>python -m examples.02_find_duplicates
+
+<span class="c"># 10 train + 10 dev эпизодов и траектории</span>
+<span class="p">$ </span>python -m auditenv export
+
+<span class="c"># в контейнере, без сети</span>
+<span class="p">$ </span>docker build -t finspector . && docker run --rm --network none finspector</pre>
+    <div class="dl" data-r><a class="btn" href="download/finspector-auditenv.zip" download>Скачать среду (.zip) <span class="arr">↓</span></a><span>Папка auditenv и примеры · {zipkb} КБ</span></div>
+  </div>
+  <div class="files" data-r style="--d:1">
+    <div><b>auditenv/env.py</b><span>reset / step, 100 шагов, 60 секунд</span></div>
+    <div><b>auditenv/generator.py</b><span>история компании → проводки → ошибки</span></div>
+    <div><b>auditenv/matcher.py</b><span>сопоставление выводов и награда</span></div>
+    <div><b>auditenv/policies.py</b><span>четыре базовые политики</span></div>
+    <div><b>auditenv/reference.py</b><span>независимая сверка эталона</span></div>
+    <div><b>auditenv/server.py</b><span>оценщик в отдельном процессе</span></div>
+    <div><b>examples/</b><span>пять примеров с этой страницы</span></div>
+    <div><b>tests/</b><span>31 тест среды, оценщика и API</span></div>
+  </div>
+</div></div></section>
+<section class="panel"><div class="content"><div class="wrap">
+  <h2 class="h2" data-r>Заглянуть глубже</h2>
+  <div class="jury">
+    <a class="glass jl" href="books.html" data-r><span class="k">06</span><b>Книги эпизода</b><span>Настоящие таблицы и эталонные ошибки в режиме оценщика.</span><i>→</i></a>
+    <a class="glass jl" href="run.html" data-r style="--d:1"><span class="k">07</span><b>Прогон политики</b><span>Как алгоритм читает книги шаг за шагом.</span><i>→</i></a>
+    <a class="glass jl" href="policies.html" data-r style="--d:2"><span class="k">08</span><b>Базовые политики</b><span>Четыре алгоритма на 20 закрытых компаниях.</span><i>→</i></a>
+    <a class="glass jl" href="https://github.com/aiguzhin/in-audit-rl-gym" data-r style="--d:3"><span class="k">GH</span><b>Исходный код</b><span>Генератор, среда, оценщик, тесты.</span><i>↗</i></a>
+  </div>
+  <div class="limits">
+    <div data-r><b>Упрощённая модель</b>Только дебиторская задолженность и один отчётный период.</div>
+    <div data-r style="--d:1"><b>Учебные данные</b>Все компании, люди и деньги вымышлены.</div>
+    <div data-r><b>Не реальный аудит</b>Высокая награда не доказывает пригодность для настоящей проверки.</div>
+    <div data-r style="--d:1"><b>Закрытая проверка</b>Для честного рейтинга оценщик использует секретные номера компаний.</div>
+  </div>
+</div></div></section>
+"""
+
+
 LEADERS = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">02</span> · Лидеры</span><span class="label">Результаты из базы данных</span></div>
+    <div class="crumbs"><span class="label"><span class="num">03</span> · Лидеры</span><span class="label">Результаты из базы данных</span></div>
     <h1 class="title">Таблица<br>лидеров</h1>
     <p class="intro" data-r style="--d:3">Каждый результат сервер пересчитывает сам: заново создаёт ту же компанию и сверяет выводы с эталоном. Поэтому балл здесь честный.</p>
   </div>
@@ -233,8 +322,8 @@ INDEX = f"""<section class="panel hero" data-float="hero">
       <div class="hero-right">
         <div class="anno" data-r style="--d:9">
           <svg class="leader" viewBox="0 0 120 120"><path d="M118 2H64L6 40v40"/></svg>
-          <div class="big">20/20<small>эпизодов</small></div>
-          <div class="row">Проверено без сети</div>
+          <div class="big">4<small>типа ошибок</small></div>
+          <div class="row">Найдите их сами</div>
         </div>
       </div>
     </div>
@@ -303,7 +392,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
     <div class="pills" data-r style="--d:1"><span class="chip-dot">Python 3.11 · 2 CPU · 4 ГБ</span><span class="chip-dot">Без сети и GPU</span></div>
     <div class="cta" data-r style="--d:2"><span class="cmd">python -m auditenv check<button id="copycmd">Скопировать</button></span></div>
     <p class="center-sub" data-r style="--d:3">27 тестов, 20 эпизодов, четыре базовые политики и разбор сбоев в одном отчёте.</p>
-    <div class="cta" data-r style="--d:4"><a class="btn" href="start.html">Как запустить <span class="arr">→</span></a></div>
+    <div class="cta" data-r style="--d:4"><a class="btn" href="python.html">Код на Python <span class="arr">→</span></a></div>
   </div>
 </section>
 """
@@ -332,6 +421,27 @@ INDEX_SCRIPT = r"""<script>
 })();
 </script>"""
 
+# --- синхронизируем среду и примеры для браузера, собираем архив для скачивания
+import shutil, zipfile
+REPO = ROOT.parent
+for sub, pat in (("auditenv", "*.py"), ("examples", "*.py")):
+    dst = ROOT / "py" / sub
+    dst.mkdir(parents=True, exist_ok=True)
+    for old in dst.glob("*.py"):
+        old.unlink()
+    for fpath in sorted((REPO / sub).glob(pat)):
+        shutil.copy2(fpath, dst / fpath.name)
+(ROOT / "download").mkdir(exist_ok=True)
+ZIP = ROOT / "download" / "finspector-auditenv.zip"
+with zipfile.ZipFile(ZIP, "w", zipfile.ZIP_DEFLATED) as z:
+    for sub in ("auditenv", "examples"):
+        for fpath in sorted((REPO / sub).glob("*.py")):
+            z.write(fpath, f"finspector/{sub}/{fpath.name}")
+    z.writestr("finspector/README.txt", "FinSpector — учебная RL-среда для аудита.\n\n"
+               "Python 3.11+, без зависимостей.\n  cd finspector\n  python -m examples.01_first_steps\n\n"
+               "Полная версия: https://github.com/aiguzhin/in-audit-rl-gym\n")
+ZIPKB = round(ZIP.stat().st_size / 1024)
+
 for f, num, name in PAGES:
     title = "Среда для ИИ-аудиторов" if f == "index.html" else name
     if f == "index.html":
@@ -340,6 +450,9 @@ for f, num, name in PAGES:
         body, script = LEADERS.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))), '<script src="assets/leaders.js"></script>'
     elif f == "profile.html":
         body, script = PROFILE, '<script src="assets/profile.js"></script>'
+    elif f == "python.html":
+        body = LAB.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))).replace("{zipkb}", str(ZIPKB))
+        script = '<script src="assets/lab.js"></script>'
     elif f == "play.html":
         body = PLAY.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78))))
         script = '<script src="assets/play.js"></script>'
@@ -349,4 +462,7 @@ for f, num, name in PAGES:
     (ROOT / f).write_text(html, encoding="utf-8")
 nf = HEAD.format(title="Страница не найдена", slug="404", nav=nav(""), logo=LOGO) + NOTFOUND.replace("{grid}", grid((30, 70), (), ())) + FOOT.format(script="")
 (ROOT / "404.html").write_text(nf, encoding="utf-8")
+(ROOT / "start.html").write_text('<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>FinSpector</title>'
+    '<meta http-equiv="refresh" content="0; url=python.html"><link rel="canonical" href="python.html"></head>'
+    '<body><a href="python.html">Перейти на страницу Python</a></body></html>', encoding="utf-8")
 print("built", len(PAGES) + 1, "pages")
