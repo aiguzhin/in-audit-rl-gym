@@ -56,7 +56,13 @@ class RemoteEnv:
             self.proc.stdin.flush()
         except Exception:
             pass
-        self.proc.wait(timeout=10)
+        try:
+            self.proc.wait(timeout=10)
+        finally:
+            if self.proc.stdin is not None:
+                self.proc.stdin.close()
+            if self.proc.stdout is not None:
+                self.proc.stdout.close()
 
 
 def run_isolated(policy_names, episodes: list[tuple[int, dict]], seed: int = 0):
@@ -71,7 +77,7 @@ def run_isolated(policy_names, episodes: list[tuple[int, dict]], seed: int = 0):
             for name in policy_names:
                 if name == "oracle":
                     truth = truth or generate_episode(ep_seed, cfg).truth   # эталон — на стороне оценщика
-                pol = make_policy(name, truth=truth, seed=seed)
+                pol = make_policy(name, truth=truth if name == "oracle" else None, seed=seed)
                 obs, info = env.reset(ep_seed, cfg)
                 pol.begin(obs, info)
                 traj = [{"episode_id": info["episode_id"], "step": 0, "action": None, "observation": obs,

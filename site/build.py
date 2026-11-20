@@ -176,7 +176,7 @@ PLAY = """<section class="panel" data-float="head">
     <div class="pl-result" id="pl-result" hidden></div>
     <div class="glass pl-base">
       <div class="t">Сравнить с программами на этой же компании</div>
-      <div class="pl-base-btns"><button class="chip" data-p="simple_reconciler">Простая сверка</button><button class="chip" data-p="random_explorer">Случайный поиск</button><button class="chip" data-p="flag_all">«Пометить всё»</button><button class="chip" data-p="oracle">Идеальный ответ</button></div>
+      <div class="pl-base-btns"><button class="chip" data-p="simple_reconciler">Простая сверка</button><button class="chip" data-p="evidence_reconciler">Сверка по правилам</button><button class="chip" data-p="random_explorer">Случайный поиск</button><button class="chip" data-p="flag_all">«Пометить всё»</button><button class="chip" data-p="oracle">Идеальный ответ</button></div>
       <div id="pl-base-out" class="pl-base-out"></div>
     </div>
   </div>
@@ -302,7 +302,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
     <p class="statement" data-r>Вся проверка — <span class="d">одна команда,</span> десять секунд <span class="d">и ноль облака.</span></p>
     <div class="pills" data-r style="--d:1"><span class="chip-dot">Python 3.11 · 2 CPU · 4 ГБ</span><span class="chip-dot">Без сети и GPU</span></div>
     <div class="cta" data-r style="--d:2"><span class="cmd">python -m auditenv check<button id="copycmd">Скопировать</button></span></div>
-    <p class="center-sub" data-r style="--d:3">27 тестов, 20 эпизодов, четыре базовые политики и разбор сбоев в одном отчёте.</p>
+    <p class="center-sub" data-r style="--d:3">Тесты, 20 эпизодов, пять базовых политик и разбор сбоев в одном отчёте.</p>
     <div class="cta" data-r style="--d:4"><a class="btn" href="start.html">Как запустить <span class="arr">→</span></a></div>
   </div>
 </section>
@@ -320,8 +320,8 @@ INDEX_SCRIPT = r"""<script>
   [["bpL","Журнал"],["bpR","Сверка"],["bf0","Счета"],["bb0","Платежи"],["bf1","Курсы"],["bb1","Итоги"]].forEach(([id, t], i) => {
     const el = document.getElementById(id); if (el) el.innerHTML = page(i * 7 + 3, t, 41 + i); });
   $("#bpR").insertAdjacentHTML("beforeend", `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`);
-  const B = D.baselines, names = {oracle: "Oracle", simple_reconciler: "Простая сверка", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
-  $("#perf-rows").innerHTML = ["oracle", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
+  const B = D.baselines, names = {oracle: "Oracle", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
+  $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
   onView($("#perf"), () => $("#perf").classList.add("seen"), .3);
   fetch(window.FA_API + "/api/stats").then(r => r.json()).then(s => { if (!s.runs) return; const el = $("#live-stats");

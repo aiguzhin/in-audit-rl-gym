@@ -33,7 +33,7 @@ def baseline(name):
     ep = generate_episode(_S["seed"], _S["cfg"])
     env = AuditEnv(mode="train", time_limit_s=10**9)
     obs, info = env.reset(episode=ep)
-    pol = make_policy(name, truth=ep.truth, seed=0)
+    pol = make_policy(name, truth=ep.truth if name == "oracle" else None, seed=0)
     pol.begin(obs, info)
     while True:
         obs, r, term, trunc, inf = env.step(pol.act(obs))

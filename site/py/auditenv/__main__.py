@@ -80,7 +80,7 @@ def cmd_export(args):
             index.append({"split": split_name, "seed": seed, "episode_id": ep.episode_id,
                           "config_hash": config_hash(resolve_config(cfg)), "issues": len(ep.truth["issues"]),
                           "counts": ep.public["manifest"]["counts"]})
-            for name in ("random_explorer", "simple_reconciler", "flag_all"):
+            for name in ("random_explorer", "simple_reconciler", "evidence_reconciler", "flag_all"):
                 traj, res = run_inprocess(make_policy(name, seed=0), seed, cfg, mode="train", episode=ep)
                 for t in traj:
                     t.update({"policy": name, "split": split_name})
@@ -149,8 +149,12 @@ def cmd_check(args):
     report["sections"]["baselines"] = table
     oracle_ok = all(r["reward"] == 1.0 for r in results if r["policy"] == "oracle")
     attack_ok = all(r["reward"] < 0 for r in results if r["policy"] == "flag_all")
-    report["sections"]["baseline_sanity"] = {"oracle_max_reward": oracle_ok, "flag_all_negative": attack_ok}
-    ok_all &= oracle_ok and attack_ok
+    evidence_ok = all(r["valid"] for r in results if r["policy"] == "evidence_reconciler")
+    report["sections"]["baseline_sanity"] = {
+        "oracle_max_reward": oracle_ok, "flag_all_negative": attack_ok,
+        "evidence_reconciler_valid": evidence_ok,
+    }
+    ok_all &= oracle_ok and attack_ok and evidence_ok
     write_jsonl(ROOT / "reports" / "check_trajectories.jsonl",
                 [t for t in traj if t["policy"] != "oracle"])
 

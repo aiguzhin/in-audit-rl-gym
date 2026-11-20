@@ -3,6 +3,7 @@ import json
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -10,8 +11,8 @@ from auditenv import calculator, matcher                               # noqa: E
 from auditenv.checks import paired_check, verify_episode                # noqa: E402
 from auditenv.env import AuditEnv                                       # noqa: E402
 from auditenv.generator import generate_episode                         # noqa: E402
-from auditenv.policies import FlagAll, Oracle, SimpleReconciler         # noqa: E402
-from auditenv.runner import run_inprocess                               # noqa: E402
+from auditenv.policies import EvidenceReconciler, FlagAll, Oracle, SimpleReconciler  # noqa: E402
+from auditenv.runner import run_inprocess, run_isolated                  # noqa: E402
 
 ERR_CFG = {"clean": False, "errors": {t: [1, 1] for t in ("duplicate_invoice", "missing_or_partial_allocation",
                                                             "fx_conversion_error", "period_cutoff_error")}}
@@ -218,6 +219,57 @@ class TestReward(unittest.TestCase):
     def test_oracle_max(self):
         _, res = run_inprocess(Oracle(self.ep.truth), 4, None, episode=self.ep)
         self.assertEqual(res["reward"], 1.0)
+
+
+class TestEvidenceReconciler(unittest.TestCase):
+    def run_policy(self, seed, config):
+        ep = generate_episode(seed, config)
+        traj, result = run_inprocess(EvidenceReconciler(), seed, None, episode=ep)
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["tp"], len(ep.truth["issues"]))
+        self.assertEqual(result["fp"], 0)
+        self.assertEqual(result["fn"], 0)
+        self.assertLessEqual(result["inspection_steps"], 100)
+        self.assertTrue(traj[-1]["terminated"])
+        return result
+
+    def test_independent_error_types(self):
+        for error_type in ERR_CFG["errors"]:
+            config = {"clean": False, "interactions": {
+                "partial_payment_wrong_fx": [0, 0], "cutoff_partial_payment_fx": [0, 0]},
+                "errors": {name: ([1, 1] if name == error_type else [0, 0])
+                           for name in ERR_CFG["errors"]}}
+            for seed in range(3):
+                with self.subTest(error_type=error_type, seed=seed):
+                    self.run_policy(seed, config)
+
+    def test_interactions_and_clean_episode(self):
+        for seed in range(3):
+            with self.subTest(config="interactions", seed=seed):
+                self.run_policy(seed, INTER_CFG)
+        self.run_policy(0, CLEAN_CFG)
+
+    def test_observations_do_not_leak_truth(self):
+        ep = generate_episode(9, INTER_CFG)
+        traj, _ = run_inprocess(EvidenceReconciler(), 9, None, episode=ep)
+        text = json.dumps([step["observation"] for step in traj])
+        for forbidden in ("issue_id", "evidence_sets", "expected_amount", "provenance", "truth", "scenario"):
+            self.assertNotIn(forbidden, text)
+
+    def test_isolated_runner_passes_truth_only_to_oracle(self):
+        from auditenv import runner
+
+        calls = []
+        make_policy = runner.make_policy
+
+        def capture_policy(name, truth=None, seed=0):
+            calls.append((name, truth is not None))
+            return make_policy(name, truth=truth, seed=seed)
+
+        with patch("auditenv.runner.make_policy", side_effect=capture_policy):
+            results, _ = run_isolated(["oracle", "evidence_reconciler"], [(2, INTER_CFG)])
+        self.assertEqual(calls, [("oracle", True), ("evidence_reconciler", False)])
+        self.assertTrue(all(result["valid"] for result in results))
 
 
 if __name__ == "__main__":

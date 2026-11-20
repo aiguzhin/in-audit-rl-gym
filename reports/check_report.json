@@ -3,7 +3,7 @@
     "unit_tests": {
       "ok": true,
       "tail": [
-        "Ran 32 tests in 3.427s",
+        "Ran 36 tests in 3.329s",
         "",
         "OK"
       ]
@@ -29,7 +29,16 @@
         "f1": 0.3684,
         "reward": -0.2892,
         "inspection_steps": 15.35,
-        "wall_s": 0.0097,
+        "wall_s": 0.0096,
+        "episodes": 20
+      },
+      "evidence_reconciler": {
+        "precision": 0.75,
+        "recall": 0.75,
+        "f1": 1.0,
+        "reward": 0.962,
+        "inspection_steps": 19,
+        "wall_s": 0.012,
         "episodes": 20
       },
       "flag_all": {
@@ -38,7 +47,7 @@
         "f1": 0.0,
         "reward": -1.0,
         "inspection_steps": 2,
-        "wall_s": 0.0031,
+        "wall_s": 0.0026,
         "episodes": 20
       },
       "oracle": {
@@ -47,13 +56,14 @@
         "f1": 1.0,
         "reward": 1.0,
         "inspection_steps": 0,
-        "wall_s": 0.0003,
+        "wall_s": 0.0002,
         "episodes": 20
       }
     },
     "baseline_sanity": {
       "oracle_max_reward": true,
-      "flag_all_negative": true
+      "flag_all_negative": true,
+      "evidence_reconciler_valid": true
     },
     "paired": {
       "passed": 20,
@@ -79,5 +89,5 @@
     }
   },
   "ok": true,
-  "elapsed_s": 7.4
+  "elapsed_s": 7.5
 }
