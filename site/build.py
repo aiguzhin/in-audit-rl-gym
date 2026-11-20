@@ -11,18 +11,19 @@ INNER, SCRIPT = PARTS["inner"], PARTS["scripts"]
 
 PAGES = [
     ("index.html", "00", "Главная"),
+    ("lessons.html", "01", "Уроки"),
     ("play.html", "01", "Песочница"),
     ("python.html", "02", "Python"),
     ("leaders.html", "03", "Лидеры"),
     ("episode.html", "04", "Как устроено"),
     ("reward.html", "05", "Награда"),
-    ("books.html", "06", "Книги эпизода"),
-    ("run.html", "07", "Прогон политики"),
-    ("policies.html", "08", "Базовые политики"),
+    ("books.html", "06", "Книги компании"),
+    ("run.html", "07", "Как ищет программа"),
+    ("policies.html", "08", "Программы-аудиторы"),
     ("profile.html", "09", "Профиль"),
 ]
-NAV = ["play.html", "python.html", "leaders.html", "episode.html", "reward.html"]
-NEXT = {"index.html": "play.html", "play.html": "python.html", "python.html": "leaders.html", "leaders.html": "episode.html",
+NAV = ["lessons.html", "play.html", "python.html", "leaders.html", "episode.html", "reward.html"]
+NEXT = {"index.html": "lessons.html", "lessons.html": "play.html", "play.html": "python.html", "python.html": "leaders.html", "leaders.html": "episode.html",
         "episode.html": "reward.html", "reward.html": "play.html", "books.html": "run.html", "run.html": "policies.html",
         "policies.html": "python.html", "profile.html": "play.html"}
 
@@ -57,7 +58,7 @@ HEAD = """<!DOCTYPE html>
 """
 
 FOOT = """</main>
-<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<footer class="bottom"><div class="wrap"><span>FinSpector · тренажёр финансового аудита · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
@@ -102,7 +103,7 @@ def inner_page(f):
     return f"""<section class="panel" data-float="head">
   {grid((22, 78), (78,), ((22, 78), (78, 78)))}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">{p["num"]}</span> · {p["crumb"]}</span><span class="label">FinSpector</span></div>
+    <div class="crumbs"><span class="label">{p["crumb"]}</span></div>
     <h1 class="title">{p["title"]}</h1>
     <p class="intro" data-r style="--d:3">{p["intro"]}</p>
   </div>
@@ -115,7 +116,7 @@ def inner_page(f):
 PLAY = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">01</span> · Песочница</span><span class="label">Настоящая среда · Python в браузере</span></div>
+    <div class="crumbs"><span class="label">Песочница</span><span class="label">Обычно 10–15 минут</span></div>
     <h1 class="title">Проведите<br>аудит сами</h1>
     <p class="intro" data-r style="--d:3">Вы — аудитор. В книгах вымышленной компании спрятаны ошибки. Найдите их, опишите с доказательствами и получите честный балл от оценщика.</p>
   </div>
@@ -152,6 +153,8 @@ PLAY = """<section class="panel" data-float="head">
           <button class="btn plain" id="cv-btn" type="button">Пересчитать</button><div class="calc-out" id="cv-out"></div>
         </div>
         <div class="glass side-panel sp help" id="sp-help" hidden>
+          <div class="hint-box"><div class="t">Застряли?</div><p class="label">Подсказка покажет запись, связанную с ещё не найденной ошибкой. С подсказками результат не попадёт в рейтинг.</p>
+            <button type="button" class="btn plain" id="pl-hint">Подсказка</button><div class="hint-out" id="hint-out" aria-live="polite"></div></div>
           <div class="t">Как искать ошибки</div>
           <details open><summary>Дубль счёта</summary><ol><li>Откройте «Счета» и счёт в инспекторе.</li><li>Смотрите «Другие счета этого контрагента»: та же дата, те же позиции и сумма — подозрение на дубль.</li><li>Подписки с разными периодами услуг — это не дубль.</li></ol></details>
           <details><summary>Неполное разнесение</summary><ol><li>Откройте платёж со ссылкой на счёт.</li><li>Инспектор сравнит «по документу» и «разнесено в 1200». Если есть разница, а остаток ушёл в 2900 — это ошибка.</li><li>Сумма вывода — неразнесённая часть в валюте платежа.</li></ol></details>
@@ -183,10 +186,29 @@ PLAY = """<section class="panel" data-float="head">
 </div></div></section>
 """
 
+LESSONS = """<section class="panel" data-float="head">
+  {grid}<div class="stars" style="opacity:.5"></div>
+  <div class="wrap page-head">
+    <div class="crumbs"><span class="label">Уроки</span><span class="label">4 урока · около 5 минут</span></div>
+    <h1 class="title">Научитесь видеть<br>ошибки в книгах</h1>
+    <p class="intro" data-r style="--d:3">Четыре коротких урока — по одному на каждый тип ошибки. В каждом: простое объяснение, задача на настоящих цифрах и ловушка, похожая на ошибку. Опыт в бухгалтерии не нужен.</p>
+  </div>
+</section>
+<section class="panel"><div class="content"><div class="wrap ls">
+  <aside class="ls-side glass" aria-label="Список уроков">
+    <div class="ls-prog"><span>Пройдено</span><b id="ls-prog-n">0 из 4</b></div>
+    <div class="meter" id="ls-prog"><i style="width:0"></i></div>
+    <nav class="ls-nav" id="ls-nav"></nav>
+    <button type="button" class="ls-reset" id="ls-reset">Начать заново</button>
+  </aside>
+  <div class="ls-main glass" id="ls-main" aria-live="polite"></div>
+</div></div></section>
+"""
+
 LAB = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">02</span> · Python</span><span class="label">Среда auditenv · прямо в браузере</span></div>
+    <div class="crumbs"><span class="label">Python</span><span class="label">Для тех, кто пишет код</span></div>
     <h1 class="title">Код на Python —<br>прямо здесь</h1>
     <p class="intro" data-r style="--d:3">Та же среда, на которой учатся ИИ-аудиторы, уже установлена в вашем браузере. Выберите пример, поменяйте код и нажмите «Запустить» — ничего ставить не нужно.</p>
   </div>
@@ -275,7 +297,7 @@ LAB = """<section class="panel" data-float="head">
 LEADERS = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">03</span> · Лидеры</span><span class="label">Результаты из базы данных</span></div>
+    <div class="crumbs"><span class="label">Лидеры</span><span class="label">Обновляется после каждой игры</span></div>
     <h1 class="title">Таблица<br>лидеров</h1>
     <p class="intro" data-r style="--d:3">Каждый результат сервер пересчитывает сам: заново создаёт ту же компанию и сверяет выводы с эталоном. Поэтому балл здесь честный.</p>
   </div>
@@ -287,7 +309,7 @@ LEADERS = """<section class="panel" data-float="head">
 </div></div></section>
 """
 
-PROFILE = """<section class="panel"><div class="content"><div class="wrap" id="profile"><p class="empty"><span class="spin"></span> Загружаем…</p></div></div></section>
+PROFILE = """<section class="panel"><h1 class="sr">Профиль</h1><div class="content"><div class="wrap" id="profile"><p class="empty"><span class="spin"></span> Загружаем…</p></div></div></section>
 """
 
 NOTFOUND = """<section class="panel hero-404" data-float="c">
@@ -315,8 +337,8 @@ INDEX = f"""<section class="panel hero" data-float="hero">
     <div class="hero-stage">
       <div class="hero-left" data-r style="--d:6">
         <h1 class="sr">FinSpector — среда для обучения ИИ-аудиторов</h1>
-        <p>Среда, в которой ИИ учится находить ошибки в финансовых книгах. Вымышленные компании, спрятанные расхождения и честная проверка каждого вывода.</p>
-        <a class="btn" href="play.html">Попробовать сейчас <span class="arr">→</span></a>
+        <p>Тренажёр финансового аудита. В книгах вымышленной компании спрятаны ошибки — найдите их, докажите и получите честный балл. Здесь же учатся ИИ-аудиторы.</p>
+        <div class="hero-cta"><a class="btn" href="lessons.html">Начать с урока <span class="arr">→</span></a><a class="btn ghost" href="play.html"><span class="dot"></span>Сразу в песочницу</a></div>
       </div>
       {BOOK}
       <div class="hero-right">
@@ -340,7 +362,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
       <div class="sstep glass" data-r style="--d:1"><span class="sn">2</span><h3>Агент ищет ошибки</h3><p>ИИ или вы листаете таблицы, сверяете суммы и даты и описываете каждую найденную ошибку с доказательствами.</p></div>
       <div class="sstep glass" data-r style="--d:2"><span class="sn">3</span><h3>Оценщик ставит балл</h3><p>Оценщик знает, где ошибки, и сравнивает с ними каждый вывод. Балл от −1 до +1, и обмануть его нельзя.</p></div>
     </div>
-    <div class="cta" data-r style="--d:3"><a class="btn" href="play.html">Попробовать самому <span class="arr">→</span></a></div>
+    <div class="cta" data-r style="--d:3"><a class="btn" href="lessons.html">Пройти 4 урока <span class="arr">→</span></a></div>
     <p class="center-sub live" id="live-stats" hidden></p>
   </div>
 </section>
@@ -373,14 +395,14 @@ INDEX = f"""<section class="panel hero" data-float="hero">
   {grid((60,), (72,), ((60, 72),))}
   <div class="wrap blue-hero">
     <div class="glass perf" id="perf" data-r>
-      <div class="t">Базовые политики</div>
+      <div class="t">Программы-аудиторы</div>
       <svg viewBox="0 0 300 110" aria-hidden="true"><path class="l" d="M6 96 C 50 92, 70 70, 100 76 S 150 98, 180 86 S 240 30, 294 10"/></svg>
       <div class="rows" id="perf-rows"></div>
     </div>
     <div>
-      <h2 class="grad" data-r>Награда,<br>которую<br>не обмануть</h2>
-      <p data-r style="--d:1">Считаются только тип, сумма, валюта и доказательства. Атака «пометить всё» получает −1, а повтор вывода ничего не даёт.</p>
-      <a class="btn" href="reward.html" data-r style="--d:2">Открыть калькулятор <span class="arr">→</span></a>
+      <h2 class="grad" data-r>Обгоните<br>программу</h2>
+      <p data-r style="--d:1">Пять программ уже прошли эти компании. Простая сверка ошибается на курсах и часовых поясах — человек, прошедший уроки, легко её обходит. Балл считается только по найденному и доказанному: «пометить всё» даёт −1.</p>
+      <a class="btn" href="play.html?daily=1" data-r style="--d:2">Пройти компанию дня <span class="arr">→</span></a>
     </div>
   </div>
 </section>
@@ -388,11 +410,12 @@ INDEX = f"""<section class="panel hero" data-float="hero">
 <section class="panel final" data-float="c">
   <div class="stars"></div>{grid((22, 76), (30, 74), ((22, 30), (76, 30), (22, 74), (76, 74)))}
   <div class="wrap">
-    <p class="statement" data-r>Вся проверка — <span class="d">одна команда,</span> десять секунд <span class="d">и ноль облака.</span></p>
-    <div class="pills" data-r style="--d:1"><span class="chip-dot">Python 3.11 · 2 CPU · 4 ГБ</span><span class="chip-dot">Без сети и GPU</span></div>
-    <div class="cta" data-r style="--d:2"><span class="cmd">python -m auditenv check<button id="copycmd">Скопировать</button></span></div>
-    <p class="center-sub" data-r style="--d:3">36 тестов, 20 эпизодов, пять базовых политик и разбор сбоев в одном отчёте.</p>
-    <div class="cta" data-r style="--d:4"><a class="btn" href="python.html">Код на Python <span class="arr">→</span></a></div>
+    <p class="statement" data-r>С чего начать?</p>
+    <div class="paths">
+      <a class="glass path" href="lessons.html" data-r style="--d:1"><span class="path-ico" aria-hidden="true">✎</span><b>Я новичок</b><span>4 урока по 1–2 минуты: что такое дубль, разнесение, курс и период.</span><i>Уроки →</i></a>
+      <a class="glass path" href="play.html?daily=1" data-r style="--d:2"><span class="path-ico" aria-hidden="true">◎</span><b>Хочу соревноваться</b><span>Компания дня одна на всех. Пройдите её и посмотрите своё место.</span><i>Компания дня →</i></a>
+      <a class="glass path" href="python.html" data-r style="--d:3"><span class="path-ico" aria-hidden="true">{{ }}</span><b>Пишу код</b><span>Напишите своего ИИ-аудитора на Python прямо в браузере.</span><i>Python →</i></a>
+    </div>
   </div>
 </section>
 """
@@ -409,15 +432,12 @@ INDEX_SCRIPT = r"""<script>
   [["bpL","Журнал"],["bpR","Сверка"],["bf0","Счета"],["bb0","Платежи"],["bf1","Курсы"],["bb1","Итоги"]].forEach(([id, t], i) => {
     const el = document.getElementById(id); if (el) el.innerHTML = page(i * 7 + 3, t, 41 + i); });
   $("#bpR").insertAdjacentHTML("beforeend", `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`);
-  const B = D.baselines, names = {oracle: "Oracle", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
+  const B = D.baselines, names = {oracle: "Идеальный ответ", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
   $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
   onView($("#perf"), () => $("#perf").classList.add("seen"), .3);
   fetch(window.FA_API + "/api/stats").then(r => r.json()).then(s => { if (!s.runs) return; const el = $("#live-stats");
     el.innerHTML = `Уже <b>${s.runs}</b> прохождений от <b>${s.players}</b> участников · лучший балл <b>${s.best_reward > 0 ? "+" : ""}${s.best_reward.toFixed(3)}</b>`; el.hidden = false; }).catch(() => {});
-  $("#copycmd").onclick = async () => { const b = $("#copycmd");
-    try { await navigator.clipboard.writeText("python -m auditenv check"); b.textContent = "Скопировано"; } catch (e) { b.textContent = "Выделите вручную"; }
-    setTimeout(() => b.textContent = "Скопировать", 2000); };
 })();
 </script>"""
 
@@ -450,6 +470,9 @@ for f, num, name in PAGES:
         body, script = LEADERS.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))), '<script src="assets/leaders.js"></script>'
     elif f == "profile.html":
         body, script = PROFILE, '<script src="assets/profile.js"></script>'
+    elif f == "lessons.html":
+        body = LESSONS.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78))))
+        script = '<script src="assets/lessons.js"></script>'
     elif f == "python.html":
         body = LAB.replace("{grid}", grid((22, 78), (78,), ((22, 78), (78, 78)))).replace("{zipkb}", str(ZIPKB))
         script = '<script src="assets/lab.js"></script>'

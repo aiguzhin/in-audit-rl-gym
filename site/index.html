@@ -20,7 +20,7 @@
 <header class="top"><div class="bar">
   <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>FinSpector</a>
   <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
-  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a></nav>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="lessons.html">Уроки</a><a href="play.html">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a></nav>
 </div></header>
 <main id="main">
 <section class="panel hero" data-float="hero">
@@ -30,8 +30,8 @@
     <div class="hero-stage">
       <div class="hero-left" data-r style="--d:6">
         <h1 class="sr">FinSpector — среда для обучения ИИ-аудиторов</h1>
-        <p>Среда, в которой ИИ учится находить ошибки в финансовых книгах. Вымышленные компании, спрятанные расхождения и честная проверка каждого вывода.</p>
-        <a class="btn" href="play.html">Попробовать сейчас <span class="arr">→</span></a>
+        <p>Тренажёр финансового аудита. В книгах вымышленной компании спрятаны ошибки — найдите их, докажите и получите честный балл. Здесь же учатся ИИ-аудиторы.</p>
+        <div class="hero-cta"><a class="btn" href="lessons.html">Начать с урока <span class="arr">→</span></a><a class="btn ghost" href="play.html"><span class="dot"></span>Сразу в песочницу</a></div>
       </div>
       <div class="book-stage" aria-hidden="true"><div class="book-glow"></div><div class="book-float"><div class="book3">
       <div class="cover"></div><div class="block l"></div><div class="block r"></div>
@@ -61,7 +61,7 @@
       <div class="sstep glass" data-r style="--d:1"><span class="sn">2</span><h3>Агент ищет ошибки</h3><p>ИИ или вы листаете таблицы, сверяете суммы и даты и описываете каждую найденную ошибку с доказательствами.</p></div>
       <div class="sstep glass" data-r style="--d:2"><span class="sn">3</span><h3>Оценщик ставит балл</h3><p>Оценщик знает, где ошибки, и сравнивает с ними каждый вывод. Балл от −1 до +1, и обмануть его нельзя.</p></div>
     </div>
-    <div class="cta" data-r style="--d:3"><a class="btn" href="play.html">Попробовать самому <span class="arr">→</span></a></div>
+    <div class="cta" data-r style="--d:3"><a class="btn" href="lessons.html">Пройти 4 урока <span class="arr">→</span></a></div>
     <p class="center-sub live" id="live-stats" hidden></p>
   </div>
 </section>
@@ -94,14 +94,14 @@
   <div class="grid-lines" aria-hidden="true"><i class="v" style="left:60%"></i><i class="h" style="top:72%"></i><b style="left:60%;top:72%"></b></div>
   <div class="wrap blue-hero">
     <div class="glass perf" id="perf" data-r>
-      <div class="t">Базовые политики</div>
+      <div class="t">Программы-аудиторы</div>
       <svg viewBox="0 0 300 110" aria-hidden="true"><path class="l" d="M6 96 C 50 92, 70 70, 100 76 S 150 98, 180 86 S 240 30, 294 10"/></svg>
       <div class="rows" id="perf-rows"></div>
     </div>
     <div>
-      <h2 class="grad" data-r>Награда,<br>которую<br>не обмануть</h2>
-      <p data-r style="--d:1">Считаются только тип, сумма, валюта и доказательства. Атака «пометить всё» получает −1, а повтор вывода ничего не даёт.</p>
-      <a class="btn" href="reward.html" data-r style="--d:2">Открыть калькулятор <span class="arr">→</span></a>
+      <h2 class="grad" data-r>Обгоните<br>программу</h2>
+      <p data-r style="--d:1">Пять программ уже прошли эти компании. Простая сверка ошибается на курсах и часовых поясах — человек, прошедший уроки, легко её обходит. Балл считается только по найденному и доказанному: «пометить всё» даёт −1.</p>
+      <a class="btn" href="play.html?daily=1" data-r style="--d:2">Пройти компанию дня <span class="arr">→</span></a>
     </div>
   </div>
 </section>
@@ -109,16 +109,17 @@
 <section class="panel final" data-float="c">
   <div class="stars"></div><div class="grid-lines" aria-hidden="true"><i class="v" style="left:22%"></i><i class="v" style="left:76%"></i><i class="h" style="top:30%"></i><i class="h" style="top:74%"></i><b style="left:22%;top:30%"></b><b style="left:76%;top:30%"></b><b style="left:22%;top:74%"></b><b style="left:76%;top:74%"></b></div>
   <div class="wrap">
-    <p class="statement" data-r>Вся проверка — <span class="d">одна команда,</span> десять секунд <span class="d">и ноль облака.</span></p>
-    <div class="pills" data-r style="--d:1"><span class="chip-dot">Python 3.11 · 2 CPU · 4 ГБ</span><span class="chip-dot">Без сети и GPU</span></div>
-    <div class="cta" data-r style="--d:2"><span class="cmd">python -m auditenv check<button id="copycmd">Скопировать</button></span></div>
-    <p class="center-sub" data-r style="--d:3">36 тестов, 20 эпизодов, пять базовых политик и разбор сбоев в одном отчёте.</p>
-    <div class="cta" data-r style="--d:4"><a class="btn" href="python.html">Код на Python <span class="arr">→</span></a></div>
+    <p class="statement" data-r>С чего начать?</p>
+    <div class="paths">
+      <a class="glass path" href="lessons.html" data-r style="--d:1"><span class="path-ico" aria-hidden="true">✎</span><b>Я новичок</b><span>4 урока по 1–2 минуты: что такое дубль, разнесение, курс и период.</span><i>Уроки →</i></a>
+      <a class="glass path" href="play.html?daily=1" data-r style="--d:2"><span class="path-ico" aria-hidden="true">◎</span><b>Хочу соревноваться</b><span>Компания дня одна на всех. Пройдите её и посмотрите своё место.</span><i>Компания дня →</i></a>
+      <a class="glass path" href="python.html" data-r style="--d:3"><span class="path-ico" aria-hidden="true">{ }</span><b>Пишу код</b><span>Напишите своего ИИ-аудитора на Python прямо в браузере.</span><i>Python →</i></a>
+    </div>
   </div>
 </section>
-<section class="panel"><div class="wrap"><a class="next" href="play.html"><div><span class="label">Дальше</span><div class="t">Песочница</div></div><span class="go">→</span></a></div></section>
+<section class="panel"><div class="wrap"><a class="next" href="lessons.html"><div><span class="label">Дальше</span><div class="t">Уроки</div></div><span class="go">→</span></a></div></section>
 </main>
-<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<footer class="bottom"><div class="wrap"><span>FinSpector · тренажёр финансового аудита · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
@@ -138,15 +139,12 @@
   [["bpL","Журнал"],["bpR","Сверка"],["bf0","Счета"],["bb0","Платежи"],["bf1","Курсы"],["bb1","Итоги"]].forEach(([id, t], i) => {
     const el = document.getElementById(id); if (el) el.innerHTML = page(i * 7 + 3, t, 41 + i); });
   $("#bpR").insertAdjacentHTML("beforeend", `<svg class="pen" style="top:47%" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M10 28C6 10 70 4 120 6c52 2 76 10 72 22-4 14-74 18-120 15C30 41 6 34 12 22c4-8 22-12 40-13"/></svg>`);
-  const B = D.baselines, names = {oracle: "Oracle", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
+  const B = D.baselines, names = {oracle: "Идеальный ответ", simple_reconciler: "Простая сверка", evidence_reconciler: "Сверка по правилам", random_explorer: "Случайный поиск", flag_all: "«Пометить всё»"};
   $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
   onView($("#perf"), () => $("#perf").classList.add("seen"), .3);
   fetch(window.FA_API + "/api/stats").then(r => r.json()).then(s => { if (!s.runs) return; const el = $("#live-stats");
     el.innerHTML = `Уже <b>${s.runs}</b> прохождений от <b>${s.players}</b> участников · лучший балл <b>${s.best_reward > 0 ? "+" : ""}${s.best_reward.toFixed(3)}</b>`; el.hidden = false; }).catch(() => {});
-  $("#copycmd").onclick = async () => { const b = $("#copycmd");
-    try { await navigator.clipboard.writeText("python -m auditenv check"); b.textContent = "Скопировано"; } catch (e) { b.textContent = "Выделите вручную"; }
-    setTimeout(() => b.textContent = "Скопировать", 2000); };
 })();
 </script>
 </body>

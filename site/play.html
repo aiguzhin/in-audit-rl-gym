@@ -20,13 +20,13 @@
 <header class="top"><div class="bar">
   <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>FinSpector</a>
   <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
-  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html" class="on" aria-current="page">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a></nav>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="lessons.html">Уроки</a><a href="play.html" class="on" aria-current="page">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html">Как устроено</a><a href="reward.html">Награда</a></nav>
 </div></header>
 <main id="main">
 <section class="panel" data-float="head">
   <div class="grid-lines" aria-hidden="true"><i class="v" style="left:22%"></i><i class="v" style="left:78%"></i><i class="h" style="top:78%"></i><b style="left:22%;top:78%"></b><b style="left:78%;top:78%"></b></div><div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">01</span> · Песочница</span><span class="label">Настоящая среда · Python в браузере</span></div>
+    <div class="crumbs"><span class="label">Песочница</span><span class="label">Обычно 10–15 минут</span></div>
     <h1 class="title">Проведите<br>аудит сами</h1>
     <p class="intro" data-r style="--d:3">Вы — аудитор. В книгах вымышленной компании спрятаны ошибки. Найдите их, опишите с доказательствами и получите честный балл от оценщика.</p>
   </div>
@@ -63,6 +63,8 @@
           <button class="btn plain" id="cv-btn" type="button">Пересчитать</button><div class="calc-out" id="cv-out"></div>
         </div>
         <div class="glass side-panel sp help" id="sp-help" hidden>
+          <div class="hint-box"><div class="t">Застряли?</div><p class="label">Подсказка покажет запись, связанную с ещё не найденной ошибкой. С подсказками результат не попадёт в рейтинг.</p>
+            <button type="button" class="btn plain" id="pl-hint">Подсказка</button><div class="hint-out" id="hint-out" aria-live="polite"></div></div>
           <div class="t">Как искать ошибки</div>
           <details open><summary>Дубль счёта</summary><ol><li>Откройте «Счета» и счёт в инспекторе.</li><li>Смотрите «Другие счета этого контрагента»: та же дата, те же позиции и сумма — подозрение на дубль.</li><li>Подписки с разными периодами услуг — это не дубль.</li></ol></details>
           <details><summary>Неполное разнесение</summary><ol><li>Откройте платёж со ссылкой на счёт.</li><li>Инспектор сравнит «по документу» и «разнесено в 1200». Если есть разница, а остаток ушёл в 2900 — это ошибка.</li><li>Сумма вывода — неразнесённая часть в валюте платежа.</li></ol></details>
@@ -94,7 +96,7 @@
 </div></div></section>
 <section class="panel"><div class="wrap"><a class="next" href="python.html"><div><span class="label">Дальше</span><div class="t">Python</div></div><span class="go">→</span></a></div></section>
 </main>
-<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<footer class="bottom"><div class="wrap"><span>FinSpector · тренажёр финансового аудита · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>

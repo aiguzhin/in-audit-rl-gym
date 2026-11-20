@@ -29,6 +29,8 @@ def step(action_json):
     return json.dumps({"obs": obs, "reward": r, "terminated": term, "truncated": trunc, "info": info}, ensure_ascii=False)
 def result():
     return json.dumps({"grader": _S["env"].grader_result(), "truth": _S["ep"].truth}, ensure_ascii=False)
+def hints():
+    return json.dumps([{"type": i["type"], "affected": i["affected_ids"], "ev": i["evidence_sets"][0]} for i in _S["ep"].truth["issues"]], ensure_ascii=False)
 def baseline(name):
     ep = generate_episode(_S["seed"], _S["cfg"])
     env = AuditEnv(mode="train", time_limit_s=10**9)
@@ -72,7 +74,9 @@ def baseline(name):
       py.runPython(`import sys; sys.path.insert(0, "/home/pyodide")\n` + BRIDGE);
       status("Готово. Выберите компанию и нажмите «Сгенерировать» — или возьмите компанию дня.");
       $("#pl-gen").disabled = false; $("#pl-daily").disabled = false; stage(1);
-      if (new URLSearchParams(location.search).get("daily")) daily();
+      const qs = new URLSearchParams(location.search);
+      if (qs.get("preset") && PRESETS[qs.get("preset")]) { $("#pl-preset").value = qs.get("preset"); generate(); }
+      else if (qs.get("daily")) daily();
     } catch (e) { status(`Не удалось загрузить Python (${esc(e.message || e)}). Обновите страницу.`); }
   }
 
@@ -85,7 +89,8 @@ def baseline(name):
       const r = call("new_episode", seed, JSON.stringify(PRESETS[$("#pl-preset").value]));
       const m = r.obs.manifest;
       S = { m, seed, preset: $("#pl-preset").value, steps: 100, done: false, tab: "ledger", query: "", findings: [], aff: [], ev: [],
-            t: { ledger: null, invoices: null, payments: null, fx: null }, fx: {}, sel: null };
+            t: { ledger: null, invoices: null, payments: null, fx: null }, fx: {}, sel: null, hints: 0, hintLvl: {} };
+      $("#hint-out").innerHTML = ""; $("#pl-hint").disabled = false;
       const foreign = m.currencies.filter(c => c !== m.base_currency);
       $("#pl-company").innerHTML = `
         <div class="cc"><span class="label">Компания</span><b>№${seed}</b><small>${esc(m.episode_id)}</small></div>
@@ -323,6 +328,24 @@ def baseline(name):
   // ================================================================ итог
   const WHY = { type: "не тот тип ошибки", affected_ids: "не те затронутые ID", currency: "не та валюта", amount: "сумма вне допуска", evidence: "не хватает доказательств",
     duplicate_or_already_matched: "повтор вывода", no_issues_in_truth: "в книгах не было ошибок" };
+  // ================================================================ подсказки (для обучения; результат с ними не идёт в рейтинг)
+  const covered = issue => S.findings.some(f => f.type === issue.type && issue.affected.every(id => f.affected_ids.includes(id)));
+  $("#pl-hint").onclick = () => {
+    if (!S || S.done) return;
+    const list = call("hints"), out = $("#hint-out");
+    S.hints++;
+    if (!list.length) { out.innerHTML = `<p><b>В этой компании ошибок нет.</b> Правильный ответ — отправить пустой список выводов.</p>`; return; }
+    const left = list.map((x, i) => ({ ...x, i })).filter(x => !covered(x));
+    if (!left.length) { out.innerHTML = `<p><b>Похоже, вы нашли всё.</b> Проверьте суммы и доказательства и отправляйте ответ.</p>`; return; }
+    const x = left[0], lvl = (S.hintLvl[x.i] = (S.hintLvl[x.i] || 0) + 1);
+    const ids = lvl === 1 ? [x.ev.find(id => !id.startsWith("DOC-")) || x.affected[0]] : lvl === 2 ? x.affected : x.ev;
+    const txt = lvl === 1 ? `Здесь есть ошибка типа <b>«${typeRu[x.type]}»</b>. Начните с этой записи:`
+      : lvl === 2 ? `Затронутые записи этой ошибки:` : `Все доказательства этой ошибки:`;
+    out.innerHTML = `<p>${txt}</p><div class="hint-ids">${ids.map(id => `<button type="button" class="idc" data-hint="${esc(id)}">${esc(id)}</button>`).join("")}</div>
+      <p class="label">${lvl < 3 ? "Нажмите «Подсказка» ещё раз, чтобы узнать больше." : "Больше подсказок по этой ошибке нет."} Использовано подсказок: ${S.hints}.</p>`;
+  };
+  $("#hint-out").addEventListener("click", e => { const b = e.target.closest("[data-hint]"); if (!b) return; setSide("inspect"); openId(b.dataset.hint); });
+
   function finish(r) {
     if (!S || S.done) return; S.done = true; stage(5);
     const { grader, truth } = call("result"); const g = grader.result;
@@ -343,7 +366,9 @@ def baseline(name):
         <button class="btn" type="submit">Сохранить <span class="arr">→</span></button><p class="save-msg" id="save-msg" role="status" aria-live="polite"></p></form>
       <div class="res-cols"><div class="glass"><div class="t">Ваши выводы</div>${verdicts || '<p class="empty">Вы не отправили выводов.</p>'}</div>
       <div class="glass"><div class="t">Что было спрятано</div>${issues}</div></div>`;
-    $("#pl-result").hidden = false; bindSave(g.inspection_steps);
+    $("#pl-result").hidden = false;
+    if (S.hints) { $("#pl-save").innerHTML = `<div><div class="t">Результат с подсказками</div><p class="label">Вы использовали подсказок: ${S.hints}. Такие прохождения не попадают в таблицу лидеров — попробуйте новую компанию без подсказок.</p></div>`; }
+    else bindSave(g.inspection_steps);
     $("#pl-again").onclick = () => { $("#pl-seed").value = Math.floor(Math.random() * 999999); generate(); };
     $("#pl-result").scrollIntoView({ behavior: UI.reduce ? "auto" : "smooth", block: "start" });
     status("Эпизод завершён. Сохраните результат или сравните себя с базовыми политиками ниже.");

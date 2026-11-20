@@ -20,41 +20,41 @@
 <header class="top"><div class="bar">
   <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l3.5 3.5M15.5 15.5 19 19"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>FinSpector</a>
   <button class="burger" aria-expanded="false" aria-controls="menu">Меню</button>
-  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="play.html">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html" class="on" aria-current="page">Как устроено</a><a href="reward.html">Награда</a></nav>
+  <nav class="menu" id="menu" aria-label="Разделы сайта"><a href="lessons.html">Уроки</a><a href="play.html">Песочница</a><a href="python.html">Python</a><a href="leaders.html">Лидеры</a><a href="episode.html" class="on" aria-current="page">Как устроено</a><a href="reward.html">Награда</a></nav>
 </div></header>
 <main id="main">
 <section class="panel" data-float="head">
   <div class="grid-lines" aria-hidden="true"><i class="v" style="left:22%"></i><i class="v" style="left:78%"></i><i class="h" style="top:78%"></i><b style="left:22%;top:78%"></b><b style="left:78%;top:78%"></b></div><div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label"><span class="num">04</span> · Эпизод</span><span class="label">FinSpector</span></div>
-    <h1 class="title">Как рождается<br>эпизод</h1>
-    <p class="intro" data-r style="--d:3">Сначала строится согласованная скрытая история компании, и только потом в неё вносятся ошибки. Поэтому эталон описывает реальное расхождение, а не случайную подозрительную строку.</p>
+    <div class="crumbs"><span class="label">Как устроено</span></div>
+    <h1 class="title">Откуда берутся<br>ошибки</h1>
+    <p class="intro" data-r style="--d:3">Каждая компания на сайте придумана с нуля: клиенты, счета, платежи и курсы валют. Сначала строятся правильные книги, а уже потом в них прячут несколько ошибок — поэтому у каждой ошибки есть точный ответ.</p>
   </div>
 </section>
 <section class="panel"><div class="content">
 <div class="wrap">
   <div class="steps4">
-    <div class="step4" data-r style="--d:0"><div class="i">01</div><h3>Скрытая история</h3><p>Клиенты, подписки, поставщики, счета прошлого, текущего и следующего месяца, платежи и курсы. Всё выводится из seed.</p></div>
-    <div class="step4" data-r style="--d:1"><div class="i">02</div><h3>Чистые проводки</h3><p>Проводки по правилам policy.json. Равенство Dr = Cr проверяется по каждому счёту и платежу ещё до ошибок.</p></div>
-    <div class="step4" data-r style="--d:2"><div class="i">03</div><h3>Ошибки с причиной</h3><p>Изменение строк записывается в provenance. Эталон получает тип, ID, сумму, допуск и наборы доказательств.</p></div>
-    <div class="step4" data-r style="--d:3"><div class="i">04</div><h3>Отрисовка</h3><p>Публичные ID и порядок зависят только от «соли». Смена ID и перестановка не меняют компанию и ответ.</p></div>
+    <div class="step4" data-r style="--d:0"><div class="i">01</div><h3>История компании</h3><p>Клиенты, подписки, счета за прошлый, текущий и следующий месяц, оплаты и курсы валют. Один номер компании — всегда одна и та же история.</p></div>
+    <div class="step4" data-r style="--d:1"><div class="i">02</div><h3>Правильные книги</h3><p>Каждый счёт и платёж записывается в журнал по правилам бухучёта. Дебет и кредит сходятся до копейки.</p></div>
+    <div class="step4" data-r style="--d:2"><div class="i">03</div><h3>Спрятанные ошибки</h3><p>Затем в книги вносятся настоящие ошибки. Для каждой сохраняется ответ: тип, затронутые записи, сумма и доказательства.</p></div>
+    <div class="step4" data-r style="--d:3"><div class="i">04</div><h3>Честная проверка</h3><p>Номера записей и порядок строк перемешиваются, поэтому ответ нельзя угадать — только найти по данным.</p></div>
   </div>
   <h2 class="h2" data-r>Четыре типа ошибок</h2>
   <div class="types">
     <div class="type" data-r style="--d:0"><code>duplicate_invoice</code><h3>Дубль счёта</h3><p>Тот же счёт введён и проведён дважды в один день: те же строки, тот же заказ.</p><p class="trap"><b>Ловушка:</b> еженедельные подписки с одинаковой суммой — это не дубли.</p></div>
-    <div class="type" data-r style="--d:1"><code>missing_or_partial_allocation</code><h3>Неполное разнесение</h3><p>Платёж ссылается на счёт, но в 1200 ушло меньше, а остаток лёг в 2900.</p><p class="trap"><b>Ловушка:</b> нераспознанные поступления в 2900 законны.</p></div>
-    <div class="type" data-r style="--d:0"><code>fx_conversion_error</code><h3>Неверный курс</h3><p>Курс чужой даты или переставленные цифры в курсе при пересчёте в базовую валюту.</p><p class="trap"><b>Ловушка:</b> курсовая разница 7000 при оплате — это норма.</p></div>
-    <div class="type" data-r style="--d:1"><code>period_cutoff_error</code><h3>Не тот период</h3><p>Документ следующего месяца проведён в текущем.</p><p class="trap"><b>Ловушка:</b> время в UTC выглядит как текущий период, хотя по поясу компании это уже следующий.</p></div>
+    <div class="type" data-r style="--d:1"><code>missing_or_partial_allocation</code><h3>Неполное разнесение</h3><p>Платёж ссылается на счёт, но на счёт клиента записана меньшая сумма, а остаток «завис» на невыясненных поступлениях (счёт 2900).</p><p class="trap"><b>Ловушка:</b> деньги без указания счёта тоже попадают в 2900 — и это не ошибка.</p></div>
+    <div class="type" data-r style="--d:0"><code>fx_conversion_error</code><h3>Неверный курс</h3><p>Сумма в чужой валюте пересчитана по курсу не той даты или с переставленными цифрами.</p><p class="trap"><b>Ловушка:</b> курсовая разница при оплате — это норма, курс за месяц меняется.</p></div>
+    <div class="type" data-r style="--d:1"><code>period_cutoff_error</code><h3>Не тот период</h3><p>Документ следующего месяца проведён в текущем.</p><p class="trap"><b>Ловушка:</b> 23:30 по Гринвичу может оказаться уже следующим днём по часам компании.</p></div>
   </div>
-  <h2 class="h2" data-r>Взаимодействующие сценарии</h2>
+  <h2 class="h2" data-r>Ошибки, которые прячут друг друга</h2>
   <div class="types">
-    <div class="type" data-r><code>partial_payment_wrong_fx</code><h3>Частичная оплата по неверному курсу</h3><p>Валютный платёж разнесён не полностью и проведён по курсу чужой даты. В эталоне две ошибки, и одна мешает увидеть другую.</p></div>
+    <div class="type" data-r><code>partial_payment_wrong_fx</code><h3>Частичная оплата по неверному курсу</h3><p>Валютный платёж разнесён не полностью и проведён по курсу чужой даты. Здесь сразу две ошибки, и одна мешает заметить другую.</p></div>
     <div class="type" data-r style="--d:1"><code>cutoff_partial_payment_fx</code><h3>Частичный платёж на границе</h3><p>Валютный платёж первых часов следующего месяца проведён рано и разнесён не до конца.</p></div>
   </div>
 </div></div></section>
 <section class="panel"><div class="wrap"><a class="next" href="reward.html"><div><span class="label">Дальше</span><div class="t">Награда</div></div><span class="go">→</span></a></div></section>
 </main>
-<footer class="bottom"><div class="wrap"><span>FinSpector · кейс 01 FinTech · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
+<footer class="bottom"><div class="wrap"><span>FinSpector · тренажёр финансового аудита · 2026</span><span>Все компании, люди и деньги вымышлены · MIT</span></div></footer>
 <button class="totop" aria-label="Наверх">↑</button>
 <script src="assets/config.js"></script>
 <script src="assets/data.js"></script>
