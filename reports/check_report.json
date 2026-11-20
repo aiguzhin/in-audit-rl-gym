@@ -3,7 +3,7 @@
     "unit_tests": {
       "ok": true,
       "tail": [
-        "Ran 27 tests in 2.631s",
+        "Ran 32 tests in 3.427s",
         "",
         "OK"
       ]
@@ -20,7 +20,7 @@
         "f1": 0.2,
         "reward": -0.6077,
         "inspection_steps": 22.85,
-        "wall_s": 0.01,
+        "wall_s": 0.005,
         "episodes": 20
       },
       "simple_reconciler": {
@@ -29,7 +29,7 @@
         "f1": 0.3684,
         "reward": -0.2892,
         "inspection_steps": 15.35,
-        "wall_s": 0.0166,
+        "wall_s": 0.0097,
         "episodes": 20
       },
       "flag_all": {
@@ -38,7 +38,7 @@
         "f1": 0.0,
         "reward": -1.0,
         "inspection_steps": 2,
-        "wall_s": 0.0052,
+        "wall_s": 0.0031,
         "episodes": 20
       },
       "oracle": {
@@ -47,7 +47,7 @@
         "f1": 1.0,
         "reward": 1.0,
         "inspection_steps": 0,
-        "wall_s": 0.0006,
+        "wall_s": 0.0003,
         "episodes": 20
       }
     },
@@ -79,5 +79,5 @@
     }
   },
   "ok": true,
-  "elapsed_s": 8.3
+  "elapsed_s": 7.4
 }

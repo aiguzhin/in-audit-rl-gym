@@ -60,6 +60,9 @@ class TestGenerator(unittest.TestCase):
     def test_sizes(self):
         m = generate_episode(5, {}).public["manifest"]["counts"]
         self.assertTrue(200 <= m["ledger"] <= 2000 and 20 <= m["documents"] <= 200, m)
+        for seed in range(25):
+            ep = generate_episode(seed, ERR_CFG)
+            self.assertLessEqual(len(ep.truth["issues"]), 12)
 
 
 class TestEnvContract(unittest.TestCase):
@@ -168,6 +171,10 @@ class TestReward(unittest.TestCase):
         fake = findings_from_truth(self.ep.truth)[:1]
         self.assertEqual(sc(self.clean, [], 10)["f1"], 1.0)
         self.assertGreater(sc(self.clean, [], 10)["reward"], sc(self.clean, fake, 0)["reward"])
+
+    def test_empty_truth_metrics(self):
+        self.assertEqual(sc(self.clean, [], 10)["f1"], 1.0)
+        self.assertEqual(sc(self.clean, findings_from_truth(self.ep.truth)[:1], 0)["f1"], 0.0)
 
     def test_duplicates_no_gain(self):
         f = findings_from_truth(self.ep.truth)

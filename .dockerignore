@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
 reports/check_trajectories.jsonl
+grader_data/
+episodes/
+trajectories/
+reports/
+site/
+.git/
+.github/
