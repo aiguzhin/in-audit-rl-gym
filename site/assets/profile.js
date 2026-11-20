@@ -12,10 +12,10 @@
     root.innerHTML = `<div class="auth-wrap">
       <div class="auth-side"><p class="label">Аккаунт FinSpector</p><h2 class="h2">${reg ? "Создайте профиль" : "С возвращением"}</h2>
         <p class="intro">Профиль хранит все ваши прохождения, лучший балл, место в рейтинге и достижения. Результаты сохраняются в базе данных и пересчитываются сервером.</p>
-        <ul class="perks"><li>История и график прогресса</li><li>8 достижений за честный аудит</li><li>Ваше имя в таблице лидеров</li></ul></div>
+        <ul class="perks"><li>История и график прогресса</li><li>9 достижений за честный аудит</li><li>Ваше имя в таблице лидеров</li></ul></div>
       <form class="glass auth-card" id="auth-form" novalidate>
         <div class="seg" role="tablist"><button type="button" role="tab" aria-selected="${!reg}" data-m="login">Вход</button><button type="button" role="tab" aria-selected="${reg}" data-m="register">Регистрация</button></div>
-        <label class="fld"><span>Логин</span><input id="a-user" autocomplete="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]{3,24}" placeholder="latin_letters_123"></label>
+        <label class="fld"><span>Логин</span><input id="a-user" autocomplete="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9][a-zA-Z0-9_.\-]{2,23}" placeholder="latin_letters_123"></label>
         ${reg ? `<label class="fld"><span>Имя в рейтинге</span><input id="a-disp" maxlength="32" autocomplete="nickname" placeholder="Например, Айгерим"></label>` : ""}
         <label class="fld"><span>Пароль${reg ? " · не короче 8 символов" : ""}</span><input id="a-pass" type="password" required minlength="8" autocomplete="${reg ? "new-password" : "current-password"}"></label>
         <p class="err" id="a-err" role="alert"></p>
@@ -26,7 +26,7 @@
     $("#auth-form").onsubmit = async e => {
       e.preventDefault(); const err = $("#a-err"); err.textContent = "";
       const username = $("#a-user").value.trim(), password = $("#a-pass").value;
-      if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) { err.textContent = "Логин: 3–24 символа, латинские буквы, цифры и _."; return; }
+      if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{2,23}$/.test(username)) { err.textContent = "Логин: 3–24 символа — латиница, цифры, точка, дефис или _."; return; }
       if (password.length < 8) { err.textContent = "Пароль должен быть не короче 8 символов."; return; }
       const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true; err.innerHTML = '<span class="spin"></span>Подключаемся к серверу…';
       try { const body = { username, password }; if (reg) body.display = ($("#a-disp").value || username).trim();

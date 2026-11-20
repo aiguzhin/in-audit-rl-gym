@@ -123,6 +123,9 @@ class TestUsernameCheck(TestAPI):
         self.assertEqual((c, r["valid"], r["available"], r["username"]), (200, True, True, "free_name"))
         self.req("/api/register", {"username": "taken_1", "password": "secret-123"})
         self.assertFalse(self.req("/api/check-username?u=taken_1")[1]["available"])
+        self.assertTrue(self.req("/api/check-username?u=aigerim.s-1")[1]["valid"])
+        self.assertFalse(self.req("/api/check-username?u=.dot")[1]["valid"])
+        self.assertEqual(self.req("/api/register", {"username": "Aigerim.S", "password": "secret-123"})[0], 200)
         bad = self.req("/api/check-username?u=ab")[1]
         self.assertFalse(bad["valid"])
 

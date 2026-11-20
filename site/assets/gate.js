@@ -13,7 +13,8 @@
   const TR = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
     ә: "a", ғ: "g", қ: "q", ң: "n", ө: "o", ұ: "u", ү: "u", һ: "h", і: "i" };
   const slug = s => s.toLowerCase().split("").map(c => TR[c] ?? c).join("").replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "").replace(/_+/g, "_").slice(0, 20);
-  const cleanLogin = s => s.toLowerCase().replace(/\s+/g, "_").split("").map(c => TR[c] ?? c).join("").replace(/[^a-z0-9_]/g, "").slice(0, 24);
+  const LOGIN_RE = /^[a-z0-9][a-z0-9_.-]{2,23}$/;
+  const lower = el => { const v = el.value, l = v.toLowerCase(); if (v !== l) { const a = el.selectionStart, b = el.selectionEnd; el.value = l; el.setSelectionRange(a, b); } return el.value; };
 
   document.body.classList.add("gated");
   const behind = [...document.body.children].filter(e => !e.matches("script"));
@@ -30,7 +31,7 @@
         <li><b>4 урока</b><span>с нуля: дубли, разнесение, курсы, период</span></li>
         <li><b>Песочница</b><span>настоящая компания с ошибками и подсказками</span></li>
         <li><b>Рейтинг</b><span>компания дня и общая таблица лидеров</span></li>
-        <li><b>Профиль</b><span>история, график прогресса и 8 достижений</span></li>
+        <li><b>Профиль</b><span>история, график прогресса и 9 достижений</span></li>
       </ul>
       <p class="gate-fine">Бесплатно. Без почты и телефона — только логин и пароль.</p>
     </aside>
@@ -47,29 +48,43 @@
   let chkT = 0, chkSeq = 0;
   function checkLogin() {
     clearTimeout(chkT); const u = st.username, seq = ++chkSeq; st.avail = null; paintLogin();
-    if (!/^[a-z0-9_]{3,24}$/.test(u)) return;
+    if (!LOGIN_RE.test(u)) return;
     st.avail = "wait"; paintLogin();
     chkT = setTimeout(async () => {
       try { const r = await AUTH.api("/api/check-username?u=" + encodeURIComponent(u), { auth: false, timeout: 60000 }); if (seq === chkSeq) { st.avail = r.available ? "ok" : "taken"; paintLogin(); } }
       catch (e) { if (seq === chkSeq) { st.avail = "unknown"; paintLogin(); } }
     }, 380);
   }
-  function loginRules(u) {
-    return [[u.length >= 3 && u.length <= 24, "3–24 символа"], [/^[a-z0-9_]*$/.test(u) && u.length > 0, "латиница, цифры и _"]];
+  function loginProblem(u) {                           // что именно не так — простыми словами
+    if (!u) return "";
+    if (/[а-яёәғқңөұүһі]/i.test(u)) return `Русские и казахские буквы в логине нельзя. Например: «${slug(u) || "aigerim"}»`;
+    if (/\s/.test(u)) return "Пробелы нельзя — используйте _ или точку.";
+    const bad = [...new Set(u.replace(/[a-z0-9_.-]/g, ""))].join(" ");
+    if (bad) return `Нельзя использовать: ${bad}. Можно латинские буквы, цифры, точку, дефис и _.`;
+    if (!/^[a-z0-9]/.test(u)) return "Логин должен начинаться с буквы или цифры.";
+    if (u.length < 3) return `Ещё ${3 - u.length} ${3 - u.length === 1 ? "символ" : "символа"} — минимум 3.`;
+    if (u.length > 24) return "Слишком длинный — максимум 24 символа.";
+    return "";
+  }
+  function ideas() {                                   // варианты логина по имени — по нажатию
+    const parts = st.display.trim().split(/\s+/).map(slug).filter(Boolean);
+    if (!parts.length) return [];
+    const y = String(new Date().getFullYear()).slice(2);
+    return [...new Set([parts.join("_"), parts[0], parts[0] + (parts[1] ? "." + parts[1][0] : "_" + y), parts[0] + "_audit"])].filter(x => LOGIN_RE.test(x) && x !== st.username).slice(0, 3);
   }
   function paintLogin() {
     const box = body.querySelector("#gt-lstate"); if (!box) return;
-    const u = st.username, rules = loginRules(u), okRules = rules.every(r => r[0]);
+    const u = st.username, prob = loginProblem(u), okRules = !!u && !prob;
     let msg = "", cls = "";
-    if (!u) msg = "Логин нужен для входа. Мы предложим его по имени.";
-    else if (!okRules) { msg = "Только латинские буквы, цифры и _, от 3 до 24 символов."; cls = "bad"; }
+    if (!u) msg = "Придумайте логин сами: латиница, цифры, точка, дефис или _. Он нужен для входа.";
+    else if (prob) { msg = prob; cls = "bad"; }
     else if (st.avail === "wait") msg = '<span class="spin"></span>Проверяем, свободен ли логин…';
     else if (st.avail === "ok") { msg = "✓ Логин свободен"; cls = "good"; }
-    else if (st.avail === "taken") { cls = "bad"; const b = u.replace(/_?\d+$/, "");
-      const alts = [b + "_" + (10 + Math.floor(Math.random() * 89)), b + "_audit", b + new Date().getFullYear()].filter(x => x.length <= 24);
-      msg = `Логин занят. Свободные варианты: ${alts.map(a => `<button type="button" class="gt-alt" data-alt="${a}">${a}</button>`).join(" ")}`; }
+    else if (st.avail === "taken") { cls = "bad"; msg = "Этот логин уже занят — попробуйте другой."; }
     else if (st.avail === "unknown") msg = "Не удалось проверить — сервер просыпается. Проверим при создании аккаунта.";
     box.className = "gt-state " + cls; box.innerHTML = msg;
+    const sug = body.querySelector("#gt-ideas"), list = (!okRules || st.avail === "taken" || !u) ? ideas() : [];
+    if (sug) sug.innerHTML = list.length ? `<span>${u ? "Или возьмите:" : "Идеи по вашему имени:"}</span>${list.map(a => `<button type="button" class="gt-alt" data-alt="${a}">${a}</button>`).join("")}` : "";
     body.querySelector("#gt-login")?.setAttribute("aria-invalid", cls === "bad");
     const next = body.querySelector("#gt-next"); if (next) next.disabled = !(st.display.trim().length >= 2 && okRules && st.avail !== "taken");
   }
@@ -103,14 +118,15 @@
         <form id="gt-f1" novalidate>
           <label class="fld"><span>Как вас называть?</span><input id="gt-name" autocomplete="name" maxlength="32" placeholder="Например, Айгерим" value="${esc(st.display)}"></label>
           <p class="gt-hint">Это имя увидят другие в таблице лидеров. Можно по-русски или по-казахски.</p>
-          <label class="fld"><span>Логин для входа</span><span class="gt-pre"><i>@</i><input id="gt-login" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="24" placeholder="aigerim" value="${esc(st.username)}" aria-describedby="gt-lstate"></span></label>
+          <label class="fld"><span>Придумайте логин</span><span class="gt-pre"><i>@</i><input id="gt-login" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="30" placeholder="например, aigerim.s" value="${esc(st.username)}" aria-describedby="gt-lstate"></span></label>
           <p class="gt-state" id="gt-lstate" aria-live="polite"></p>
+          <div class="gt-ideas" id="gt-ideas"></div>
           <button class="btn gt-wide" id="gt-next" type="submit" disabled>Дальше <span class="arr">→</span></button>
         </form>`;
       const n = body.querySelector("#gt-name"), l = body.querySelector("#gt-login");
-      n.oninput = () => { st.display = n.value; if (!st.loginTouched) { st.username = slug(n.value); l.value = st.username; checkLogin(); } else paintLogin(); };
-      l.oninput = () => { st.loginTouched = true; const c = cleanLogin(l.value); if (c !== l.value) l.value = c; st.username = c; checkLogin(); };
-      body.querySelector("#gt-lstate").onclick = e => { const b = e.target.closest("[data-alt]"); if (b) { st.username = b.dataset.alt; st.loginTouched = true; l.value = st.username; checkLogin(); } };
+      n.oninput = () => { st.display = n.value; paintLogin(); };
+      l.oninput = () => { st.username = lower(l).trim(); checkLogin(); };
+      body.querySelector("#gt-ideas").onclick = e => { const b = e.target.closest("[data-alt]"); if (b) { st.username = b.dataset.alt; l.value = st.username; checkLogin(); l.focus(); } };
       body.querySelector("#gt-f1").onsubmit = e => { e.preventDefault(); if (body.querySelector("#gt-next").disabled) return; st.step = 2; render(); };
       paintLogin(); if (st.username) checkLogin();
       (st.display ? l : n).focus();
@@ -138,7 +154,7 @@
       body.querySelectorAll("[name=goal]").forEach(r => r.onchange = () => st.goal = r.value);
       body.querySelector("#gt-back").onclick = () => { st.step = 1; render(); };
       body.querySelector("#gt-f2").onsubmit = async e => { e.preventDefault(); const btn = body.querySelector("#gt-create"); if (btn.disabled) return;
-        await send(btn, "/api/register", { username: st.username, password: st.pass, display: st.display.trim() }, err => {
+        await send(btn, "/api/register", { username: st.username.trim(), password: st.pass, display: st.display.trim() }, err => {
           if (/логин/i.test(err)) { st.step = 1; st.avail = /занят/.test(err) ? "taken" : null; render(); paintLogin(); } }); };
       paintPass(); p.focus();
     }
@@ -153,7 +169,7 @@
         <p class="gt-fine">Нет аккаунта? <button type="button" class="gt-link" id="gt-toreg">Зарегистрируйтесь за минуту</button></p>
       </form>`;
     const u = body.querySelector("#gt-lu"), p = body.querySelector("#gt-lp"), eye = body.querySelector("#gt-leye");
-    u.oninput = () => { const c = cleanLogin(u.value); if (c !== u.value) u.value = c; st.username = c; };
+    u.oninput = () => { st.username = lower(u).trim(); };
     eye.onclick = () => { const show = p.type === "password"; p.type = show ? "text" : "password"; eye.textContent = show ? "Скрыть" : "Показать"; eye.setAttribute("aria-pressed", show); p.focus(); };
     body.querySelector("#gt-toreg").onclick = () => { st.mode = "reg"; st.step = 1; render(); };
     body.querySelector("#gt-fl").onsubmit = async e => { e.preventDefault();

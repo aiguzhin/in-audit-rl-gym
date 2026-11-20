@@ -51,7 +51,7 @@ PRESETS = {
 }
 ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "https://fin-audit-rl-gym.onrender.com").split(",") if o.strip()]
 NAME_RE = re.compile(r"[^\w \-.]", re.UNICODE)
-USER_RE = re.compile(r"^[a-z0-9_]{3,24}$")
+USER_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]{2,23}$")
 MAX_BODY = 64_000
 TOKEN_TTL = 30 * 24 * 3600
 TZ = dt.timezone(dt.timedelta(hours=5))          # «компания дня» меняется в полночь по Астане
@@ -191,7 +191,7 @@ def register(body: dict, ip: str) -> dict:
     password = str(body.get("password", ""))
     display = NAME_RE.sub("", str(body.get("display") or username))[:32].strip() or username
     if not USER_RE.match(username):
-        raise ApiError(400, "Логин: 3–24 символа, только латинские буквы, цифры и _.")
+        raise ApiError(400, "Логин: 3–24 символа — латинские буквы, цифры, точка, дефис или _ (начинается с буквы или цифры).")
     if len(password) < 8 or len(password) > 200:
         raise ApiError(400, "Пароль должен быть не короче 8 символов.")
     if get_db().exec("SELECT 1 FROM users WHERE username = ?", (username,), fetch=True):
