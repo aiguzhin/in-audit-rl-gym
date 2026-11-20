@@ -47,7 +47,7 @@
       ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.reward)}" r="3.5" class="${p.reward < 0 ? "neg" : "pos"}"><title>${fmt(p.reward)}</title></circle>`).join("")}</svg>`;
   }
 
-  const lessonsDone = () => { try { return Object.keys(JSON.parse(localStorage.getItem("fs-lessons")) || {}).length; } catch (e) { return 0; } };
+  const lessonsDone = () => window.LEARN ? LEARN.ITEMS.filter(x => LEARN.isDone(x.id)).length : 0;
   function today(s, ach) {
     const next = ach.find(a => !a.done), L = lessonsDone();
     const fire = s.streak ? `<b class="big">${s.streak}</b><span>${plural(s.streak, "день", "дня", "дней")} подряд</span>` : `<b class="big">0</b><span>дней подряд</span>`;
@@ -55,10 +55,11 @@
       <div class="glass pt-card"><span class="label">Серия</span><div class="pt-row">${fire}</div>
         <p>${s.today ? "Сегодня результат уже есть — серия продолжается." : s.streak ? "Сохраните результат сегодня, чтобы не прервать серию." : "Сохраняйте хотя бы один результат в день — получите достижение «Три дня подряд»."}</p>
         ${s.today ? "" : `<a class="btn plain" href="play.html?daily=1">Компания дня</a>`}</div>
-      <div class="glass pt-card"><span class="label">Уроки</span><div class="pt-row"><b class="big">${L}</b><span>из 4 пройдено</span></div>
-        <div class="meter"><i style="width:${L / 4 * 100}%"></i></div>
-        <p>${L >= 4 ? "Все уроки пройдены. Попробуйте сложный сценарий в песочнице." : "Короткие уроки по каждому типу ошибки — по 1–2 минуты."}</p>
-        <a class="btn plain" href="${L >= 4 ? "play.html?preset=inter" : "lessons.html"}">${L >= 4 ? "Сложная компания" : L ? "Продолжить уроки" : "Начать уроки"}</a></div>
+      ${(() => { const T = LEARN.ITEMS.length, pl = LEARN.plan(), stt = pl ? LEARN.status(pl) : null;
+        return `<div class="glass pt-card"><span class="label">Обучение</span><div class="pt-row"><b class="big">${L}</b><span>из ${T} шагов курса</span></div>
+        <div class="meter"><i style="width:${L / T * 100}%"></i></div>
+        <p>${!pl ? "План ещё не выбран — выберите темп и дни занятий." : stt.finished ? "Курс пройден целиком." : stt.due.length ? `На сегодня по плану: ${stt.due.length}.` : "Сегодня по плану отдых."} ${pl ? UI.esc(LEARN.describe(pl)) + "." : ""}</p>
+        <a class="btn plain" href="lessons.html">${!pl ? "Выбрать план" : stt.due.length ? "К занятию" : "Открыть план"}</a></div>`; })()}
       <div class="glass pt-card"><span class="label">Следующее достижение</span>${next ? `<div class="pt-row"><b>${next.title}</b></div><p>${next.hint}.</p>` : `<div class="pt-row"><b>Все собраны!</b></div><p>Вы получили все достижения FinSpector.</p>`}
         <a class="btn plain" href="play.html">Новый аудит</a></div></div>`;
   }
@@ -94,6 +95,7 @@
 
   async function load() {
     if (!AUTH.user()) return authView();
+    if (window.LEARN) LEARN.sync();
     root.innerHTML = `<p class="empty"><span class="spin"></span> Загружаем профиль… Бесплатный сервер просыпается до минуты.</p>`;
     let d; try { d = await AUTH.api("/api/me"); } catch (e) {
       if (!AUTH.user()) return authView();
@@ -124,5 +126,6 @@
     bindSettings();
   }
   addEventListener("fs:auth", load);
+  addEventListener("fs:plan", () => { if (document.querySelector(".pf-today") && AUTH.user()) load(); });
   load();
 })();

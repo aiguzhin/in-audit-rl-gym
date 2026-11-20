@@ -11,7 +11,7 @@ INNER, SCRIPT = PARTS["inner"], PARTS["scripts"]
 
 PAGES = [
     ("index.html", "00", "Главная"),
-    ("lessons.html", "01", "Уроки"),
+    ("lessons.html", "01", "Обучение"),
     ("play.html", "01", "Песочница"),
     ("python.html", "02", "Python"),
     ("leaders.html", "03", "Лидеры"),
@@ -64,6 +64,7 @@ FOOT = """</main>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/auth.js"></script>
+<script src="assets/learn.js"></script>
 <script src="assets/gate.js"></script>
 <script src="assets/floaters.js"></script>
 <script src="assets/guide.js"></script>
@@ -190,20 +191,12 @@ PLAY = """<section class="panel" data-float="head">
 LESSONS = """<section class="panel" data-float="head">
   {grid}<div class="stars" style="opacity:.5"></div>
   <div class="wrap page-head">
-    <div class="crumbs"><span class="label">Уроки</span><span class="label">4 урока · около 5 минут</span></div>
+    <div class="crumbs"><span class="label">Обучение</span><span class="label">12 уроков и 5 практик</span></div>
     <h1 class="title">Научитесь видеть<br>ошибки в книгах</h1>
-    <p class="intro" data-r style="--d:3">Четыре коротких урока — по одному на каждый тип ошибки. В каждом: простое объяснение, задача на настоящих цифрах и ловушка, похожая на ошибку. Опыт в бухгалтерии не нужен.</p>
+    <p class="intro" data-r style="--d:3">Курс из четырёх модулей: основы, четыре типа ошибок, сложные случаи и практика на настоящих компаниях. В каждом уроке — простое объяснение, задача и ловушка. Опыт в бухгалтерии не нужен.</p>
   </div>
 </section>
-<section class="panel"><div class="content"><div class="wrap ls">
-  <aside class="ls-side glass" aria-label="Список уроков">
-    <div class="ls-prog"><span>Пройдено</span><b id="ls-prog-n">0 из 4</b></div>
-    <div class="meter" id="ls-prog"><i style="width:0"></i></div>
-    <nav class="ls-nav" id="ls-nav"></nav>
-    <button type="button" class="ls-reset" id="ls-reset">Начать заново</button>
-  </aside>
-  <div class="ls-main glass" id="ls-main" aria-live="polite"></div>
-</div></div></section>
+<section class="panel"><div class="content"><div class="wrap"><div id="learn" class="learn" aria-live="polite"></div></div></div></section>
 """
 
 LAB = """<section class="panel" data-float="head">
@@ -345,7 +338,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
       <div class="hero-left" data-r style="--d:6">
         <h1 class="sr">FinSpector — среда для обучения ИИ-аудиторов</h1>
         <p>Тренажёр финансового аудита. В книгах вымышленной компании спрятаны ошибки — найдите их, докажите и получите честный балл. Здесь же учатся ИИ-аудиторы.</p>
-        <div class="hero-cta"><a class="btn" href="lessons.html">Начать с урока <span class="arr">→</span></a><a class="btn ghost" href="play.html"><span class="dot"></span>Сразу в песочницу</a></div>
+        <div class="hero-cta"><a class="btn" id="hero-learn" href="lessons.html">Начать обучение <span class="arr">→</span></a><a class="btn ghost" href="play.html"><span class="dot"></span>Сразу в песочницу</a></div>
       </div>
       {BOOK}
       <div class="hero-right">
@@ -369,7 +362,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
       <div class="sstep glass" data-r style="--d:1"><span class="sn">2</span><h3>Агент ищет ошибки</h3><p>ИИ или вы листаете таблицы, сверяете суммы и даты и описываете каждую найденную ошибку с доказательствами.</p></div>
       <div class="sstep glass" data-r style="--d:2"><span class="sn">3</span><h3>Оценщик ставит балл</h3><p>Оценщик знает, где ошибки, и сравнивает с ними каждый вывод. Балл от −1 до +1, и обмануть его нельзя.</p></div>
     </div>
-    <div class="cta" data-r style="--d:3"><a class="btn" href="lessons.html">Пройти 4 урока <span class="arr">→</span></a></div>
+    <div class="cta" data-r style="--d:3"><a class="btn" href="lessons.html">Начать обучение <span class="arr">→</span></a></div>
     <p class="center-sub live" id="live-stats" hidden></p>
   </div>
 </section>
@@ -419,7 +412,7 @@ INDEX = f"""<section class="panel hero" data-float="hero">
   <div class="wrap">
     <p class="statement" data-r>С чего начать?</p>
     <div class="paths">
-      <a class="glass path" href="lessons.html" data-r style="--d:1"><span class="path-ico" aria-hidden="true">✎</span><b>Я новичок</b><span>4 урока по 1–2 минуты: что такое дубль, разнесение, курс и период.</span><i>Уроки →</i></a>
+      <a class="glass path" href="lessons.html" data-r style="--d:1"><span class="path-ico" aria-hidden="true">✎</span><b>Я новичок</b><span>Курс из 12 коротких уроков и 5 практик — по вашему плану и графику.</span><i>Обучение →</i></a>
       <a class="glass path" href="play.html?daily=1" data-r style="--d:2"><span class="path-ico" aria-hidden="true">◎</span><b>Хочу соревноваться</b><span>Компания дня одна на всех. Пройдите её и посмотрите своё место.</span><i>Компания дня →</i></a>
       <a class="glass path" href="python.html" data-r style="--d:3"><span class="path-ico" aria-hidden="true">{{ }}</span><b>Пишу код</b><span>Напишите своего ИИ-аудитора на Python прямо в браузере.</span><i>Python →</i></a>
     </div>
@@ -443,6 +436,11 @@ INDEX_SCRIPT = r"""<script>
   $("#perf-rows").innerHTML = ["oracle", "evidence_reconciler", "simple_reconciler", "random_explorer", "flag_all"].map(k =>
     `<div class="r"><span>${names[k]}</span><b class="${B[k].reward < 0 ? "neg" : "pos"}">${(B[k].reward > 0 ? "+" : "") + B[k].reward.toFixed(2)}</b></div>`).join("");
   onView($("#perf"), () => $("#perf").classList.add("seen"), .3);
+  // для тех, кто уже учится, — продолжить с нужного места
+  const hl = $("#hero-learn"); const showNext = () => { if (!window.LEARN || !AUTH.user()) return; const pl = LEARN.plan(), n = LEARN.ITEMS.find(x => !LEARN.isDone(x.id));
+    if (!n) { hl.innerHTML = 'Компания дня <span class="arr">→</span>'; hl.href = "play.html?daily=1"; return; }
+    if (pl || LEARN.ITEMS.some(x => LEARN.isDone(x.id))) { hl.innerHTML = `Продолжить: ${esc(n.title)} <span class="arr">→</span>`; hl.href = n.practice ? n.href : "lessons.html#l=" + n.id; } };
+  showNext(); addEventListener("fs:plan", showNext); addEventListener("fs:progress", showNext); if (window.LEARN) LEARN.sync();
   fetch(window.FA_API + "/api/stats").then(r => r.json()).then(s => { if (!s.runs) return; const el = $("#live-stats");
     el.innerHTML = `Уже <b>${s.runs}</b> прохождений от <b>${s.players}</b> участников · лучший балл <b>${s.best_reward > 0 ? "+" : ""}${s.best_reward.toFixed(3)}</b>`; el.hidden = false; }).catch(() => {});
 })();

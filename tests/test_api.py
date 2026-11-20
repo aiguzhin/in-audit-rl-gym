@@ -69,6 +69,19 @@ class TestAPI(unittest.TestCase):
         self.assertEqual((me["stats"]["streak"], me["stats"]["today"]), (1, True))
         self.assertEqual(server.streak_of({"2000-01-01"}), 0)
 
+    def test_plan_and_progress(self):
+        tok = self.token("planner_1")
+        self.assertEqual(self.req("/api/plan", {"pace": "normal", "days": [1, 3, 5], "time": "evening", "start": "2026-11-21"})[0], 401)
+        self.assertEqual(self.req("/api/plan", {"pace": "x", "days": [1], "time": "evening", "start": "2026-11-21"}, token=tok)[0], 400)
+        self.assertEqual(self.req("/api/plan", {"pace": "fast", "days": [], "time": "day", "start": "2026-11-21"}, token=tok)[0], 400)
+        c, r = self.req("/api/plan", {"pace": "normal", "days": [5, 1, 3, 3], "time": "evening", "start": "2026-11-21"}, token=tok)
+        self.assertEqual((c, r["plan"]["days"]), (200, [1, 3, 5]))
+        self.req("/api/progress", {"done": {"dup": 100, "bad key!": 5}}, token=tok)
+        c, r = self.req("/api/progress", {"done": {"fx": 200, "dup": 300}}, token=tok)
+        self.assertEqual(r["done"], {"dup": 100, "fx": 200})
+        me = self.req("/api/me", token=tok)[1]
+        self.assertEqual((me["plan"]["pace"], me["progress"]["fx"]), ("normal", 200))
+
     def test_register_login_me(self):
         c, r = self.req("/api/register", {"username": "aigerim_1", "password": "secret-123", "display": "Айгерим"})
         self.assertEqual(c, 200, r)

@@ -88,7 +88,8 @@ def baseline(name):
     setTimeout(() => {
       const r = call("new_episode", seed, JSON.stringify(PRESETS[$("#pl-preset").value]));
       const m = r.obs.manifest;
-      S = { m, seed, preset: $("#pl-preset").value, steps: 100, done: false, tab: "ledger", query: "", findings: [], aff: [], ev: [],
+      const isDaily = pendingDaily; pendingDaily = false;
+      S = { m, seed, isDaily, preset: $("#pl-preset").value, steps: 100, done: false, tab: "ledger", query: "", findings: [], aff: [], ev: [],
             t: { ledger: null, invoices: null, payments: null, fx: null }, fx: {}, sel: null, hints: 0, hintLvl: {} };
       $("#hint-out").innerHTML = ""; $("#pl-hint").disabled = false;
       const foreign = m.currencies.filter(c => c !== m.base_currency);
@@ -357,6 +358,11 @@ def baseline(name):
     const issues = truth.issues.map(i => `<div class="v"><span class="tag ${missed.has(i.issue_id) ? "fn" : "tp"}">${missed.has(i.issue_id) ? "Пропущено" : "Найдено"}</span><span><b>${typeRu[i.type]}</b> · ${esc(i.affected_ids.join(", "))} · ${money(i.expected_amount_minor, i.currency)}<br><span class="null">доказательства: ${esc(i.evidence_sets[0].join(", "))}</span></span></div>`).join("")
       || `<p class="empty">Компания была чистой — ошибок не было.</p>`;
     const rew = g.reward;
+    if (window.LEARN && !S.hints) {                      // практика из курса обучения засчитывается сама
+      const P = { single: rew > 0, clean: rew > 0.5, mixed: rew > 0, inter: g.tp > 0 };
+      if (P[S.preset]) LEARN.markDone("p_" + S.preset);
+      if (S.isDaily) LEARN.markDone("p_daily");
+    }
     $("#pl-result").innerHTML = `<div class="res-head glass"><div><span class="label">${r && r.truncated ? "Шаги закончились — засчитан пустой ответ" : "Оценщик проверил ваш ответ"}</span>
       <div class="big ${rew < 0 ? "neg" : "pos"}">${rew > 0 ? "+" : ""}${rew.toFixed(3)}</div><span class="label">награда от −1 до +1</span></div>
       <div class="meters">${[["Точность", g.precision.toFixed(2)], ["Полнота", g.recall.toFixed(2)], ["F1", g.f1.toFixed(2)], ["Шагов", g.inspection_steps]].map(([k, v]) => `<div><span class="label">${k}</span><div class="n">${v}</div></div>`).join("")}</div>
@@ -387,8 +393,9 @@ def baseline(name):
         if (!u) try { localStorage.setItem("fa-name", name); } catch (e) {}
         msg.innerHTML = `Сохранено. ${r.daily ? "Место в рейтинге дня" : "Место в общем рейтинге"}: <b>#${r.rank}</b>. Балл по пересчёту сервера: <b>${r.reward > 0 ? "+" : ""}${r.reward.toFixed(3)}</b>. <a href="leaders.html">Таблица лидеров →</a>${u ? ' · <a href="profile.html">Профиль →</a>' : ""}`; }
       catch (err) { btn.disabled = false; msg.textContent = err.message; } }; }
+  let pendingDaily = false;
   async function daily() { const b = $("#pl-daily"); b.disabled = true; status("Узнаём компанию дня…", true);
-    try { const d = await AUTH.api("/api/daily", { auth: false }); $("#pl-seed").value = d.seed; $("#pl-preset").value = "mixed"; generate(); }
+    try { const d = await AUTH.api("/api/daily", { auth: false }); $("#pl-seed").value = d.seed; $("#pl-preset").value = "mixed"; pendingDaily = true; generate(); }
     catch (e) { status(esc(e.message)); } finally { b.disabled = false; } }
   $("#pl-daily").onclick = daily;
   $$(".pl-base-btns .chip").forEach(b => b.onclick = () => { if (!S) return; const name = b.dataset.p; b.disabled = true;

@@ -9,6 +9,8 @@
   GET  /api/check-username?u=логин                        -> {valid, available}
   POST /api/password   {old, new}  (с токеном)             -> {ok}
   POST /api/profile    {display}   (с токеном)             -> {user}
+  POST /api/plan       {pace, days, time, start}            -> {plan}
+  POST /api/progress   {done: {id: время}}                  -> {done}
   GET  /api/me         (Authorization: Bearer <token>)     -> профиль, статистика, история, достижения
   GET  /api/daily                                          -> номер «компании дня»
   GET  /api/leaderboard?limit=20&scope=all|daily
@@ -85,12 +87,13 @@ class DB:
             f1 {real}, precision {real}, recall {real}, tp INTEGER, fp INTEGER, fn INTEGER, steps INTEGER)""")
         self.exec(f"""CREATE TABLE IF NOT EXISTS users(id {serial}, created_at {ts}, username TEXT UNIQUE NOT NULL,
             display TEXT NOT NULL, pass_hash TEXT NOT NULL)""")
-        for col in ("user_id INTEGER", "clean INTEGER", "day TEXT"):
+        for table, col in (("results", "user_id INTEGER"), ("results", "clean INTEGER"), ("results", "day TEXT"),
+                           ("users", "plan TEXT"), ("users", "progress TEXT")):
             if self.pg:
-                self.exec(f"ALTER TABLE results ADD COLUMN IF NOT EXISTS {col}")
+                self.exec(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col}")
             else:
                 try:
-                    self.exec(f"ALTER TABLE results ADD COLUMN {col}")
+                    self.exec(f"ALTER TABLE {table} ADD COLUMN {col}")
                 except sqlite3.OperationalError:
                     pass
 
@@ -263,6 +266,7 @@ def me(uid: int) -> dict:
     u = get_db().exec("SELECT id, username, display, created_at FROM users WHERE id = ?", (uid,), fetch=True)
     if not u:
         raise ApiError(401, "Сессия устарела. Войдите снова.")
+    pp = get_db().exec("SELECT plan, progress FROM users WHERE id = ?", (uid,), fetch=True)[0]
     rows = get_db().exec("SELECT created_at, seed, preset, reward, f1, tp, fp, fn, steps, clean, day FROM results "
                          "WHERE user_id = ? ORDER BY id DESC LIMIT 200", (uid,), fetch=True)
     keys = ("created_at", "seed", "preset", "reward", "f1", "tp", "fp", "fn", "steps", "clean", "day")
@@ -300,6 +304,8 @@ def me(uid: int) -> dict:
                       "found": sum(h["tp"] or 0 for h in hist), "false": sum(h["fp"] or 0 for h in hist), "rank": rank,
                       "streak": streak, "days": len(days), "today": today() in days},
             "history": hist,
+            "plan": json.loads(pp[0]) if pp[0] else None,
+            "progress": json.loads(pp[1]) if pp[1] else {},
             "achievements": [{"id": a, "title": t, "hint": d, "done": a in got} for a, t, d in ACHIEVEMENTS]}
 
 
@@ -317,6 +323,48 @@ def change_password(body: dict, ip: str, uid: int | None) -> dict:
         raise ApiError(400, "Новый пароль должен быть не короче 8 символов.")
     get_db().exec("UPDATE users SET pass_hash = ? WHERE id = ?", (hash_password(new), uid))
     return {"ok": True}
+
+
+PACES = {"fast", "normal", "calm"}
+TIMES = {"morning", "day", "evening"}
+ITEM_RE = re.compile(r"^[a-z0-9_]{2,24}$")
+
+
+def save_plan(body: dict, ip: str, uid: int | None) -> dict:
+    """План учёбы: темп, дни недели (1=пн … 7=вс), время дня и дата начала."""
+    rate("plan:" + ip, 30)
+    if not uid:
+        raise ApiError(401, "Войдите в аккаунт.")
+    pace, time_, start = body.get("pace"), body.get("time"), str(body.get("start", ""))
+    days = body.get("days")
+    if pace not in PACES or time_ not in TIMES:
+        raise ApiError(400, "Выберите темп и время занятий.")
+    if not isinstance(days, list) or not days or not all(isinstance(d, int) and 1 <= d <= 7 for d in days):
+        raise ApiError(400, "Выберите хотя бы один день недели.")
+    try:
+        dt.date.fromisoformat(start)
+    except ValueError:
+        raise ApiError(400, "Неверная дата начала.")
+    plan = {"pace": pace, "days": sorted(set(days)), "time": time_, "start": start}
+    get_db().exec("UPDATE users SET plan = ? WHERE id = ?", (json.dumps(plan), uid))
+    return {"plan": plan}
+
+
+def save_progress(body: dict, ip: str, uid: int | None) -> dict:
+    """Пройденные уроки и практика: {id: время}. Сливается с уже сохранённым — ничего не теряется."""
+    rate("prog:" + ip, 60)
+    if not uid:
+        raise ApiError(401, "Войдите в аккаунт.")
+    done = body.get("done")
+    if not isinstance(done, dict) or len(done) > 100:
+        raise ApiError(400, "Неверный формат прогресса.")
+    row = get_db().exec("SELECT progress FROM users WHERE id = ?", (uid,), fetch=True)
+    cur = json.loads(row[0][0]) if row and row[0][0] else {}
+    for k, v in done.items():
+        if ITEM_RE.match(str(k)) and isinstance(v, (int, float)) and v > 0:
+            cur[str(k)] = min(int(cur.get(str(k), v)), int(v)) if str(k) in cur else int(v)
+    get_db().exec("UPDATE users SET progress = ? WHERE id = ?", (json.dumps(cur), uid))
+    return {"done": cur}
 
 
 def update_profile(body: dict, ip: str, uid: int | None) -> dict:
@@ -459,7 +507,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
-        if path not in ("/api/results", "/api/register", "/api/login", "/api/password", "/api/profile"):
+        if path not in ("/api/results", "/api/register", "/api/login", "/api/password", "/api/profile", "/api/plan", "/api/progress"):
             return self._json(404, {"error": "Не найдено."})
         length = int(self.headers.get("Content-Length") or 0)
         if length <= 0 or length > MAX_BODY:
@@ -479,6 +527,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._handle(lambda: change_password(body, ip, self._uid()))
         if path == "/api/profile":
             return self._handle(lambda: update_profile(body, ip, self._uid()))
+        if path == "/api/plan":
+            return self._handle(lambda: save_plan(body, ip, self._uid()))
+        if path == "/api/progress":
+            return self._handle(lambda: save_progress(body, ip, self._uid()))
         return self._handle(lambda: submit(body, ip, self._uid()))
 
     def log_message(self, fmt, *args):

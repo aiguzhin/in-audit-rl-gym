@@ -9,7 +9,7 @@
     return;
   }
   const { esc } = UI;
-  const GOALS = { learn: ["lessons.html", "Начать с урока"], play: ["play.html?daily=1", "Пройти компанию дня"], code: ["python.html", "Открыть Python"] };
+  const GOALS = { learn: ["lessons.html", "Открыть обучение"], play: ["play.html?daily=1", "Пройти компанию дня"], code: ["python.html", "Открыть Python"] };
   const TR = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
     ә: "a", ғ: "g", қ: "q", ң: "n", ө: "o", ұ: "u", ү: "u", һ: "h", і: "i" };
   const slug = s => s.toLowerCase().split("").map(c => TR[c] ?? c).join("").replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "").replace(/_+/g, "_").slice(0, 20);
@@ -28,7 +28,7 @@
       <h2>Тренажёр финансового аудита</h2>
       <p>Находите ошибки в книгах вымышленных компаний и получайте честный балл. Аккаунт нужен, чтобы сохранять прогресс.</p>
       <ul class="gate-perks">
-        <li><b>4 урока</b><span>с нуля: дубли, разнесение, курсы, период</span></li>
+        <li><b>Курс из 12 уроков</b><span>с нуля, по личному плану и графику</span></li>
         <li><b>Песочница</b><span>настоящая компания с ошибками и подсказками</span></li>
         <li><b>Рейтинг</b><span>компания дня и общая таблица лидеров</span></li>
         <li><b>Профиль</b><span>история, график прогресса и 9 достижений</span></li>
@@ -109,7 +109,7 @@
   }
 
   // ---------------------------------------------------------------- экраны
-  function steps() { return `<ol class="gt-steps" aria-label="Шаги регистрации">${["Имя и логин", "Пароль и цель"].map((s, i) => `<li class="${i + 1 < st.step ? "done" : i + 1 === st.step ? "on" : ""}"><span>${i + 1 < st.step ? "✓" : i + 1}</span>${s}</li>`).join("")}</ol>`; }
+  function steps() { return `<ol class="gt-steps" aria-label="Шаги регистрации">${["Имя и логин", "Пароль и цель", "План учёбы"].map((s, i) => `<li class="${i + 1 < st.step ? "done" : i + 1 === st.step ? "on" : ""}"><span>${i + 1 < st.step ? "✓" : i + 1}</span>${s}</li>`).join("")}</ol>`; }
   function render() {
     g.querySelectorAll(".gate-tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.m === st.mode));
     if (st.mode === "in") return renderLogin();
@@ -140,7 +140,7 @@
           <div class="gt-mrow"><span id="gt-mtxt" aria-live="polite"></span><button type="button" class="gt-link" id="gt-gen">Придумать за меня</button></div>
           <ul class="gt-checks" id="gt-checks"></ul>
           <fieldset class="gt-goal"><legend>С чего хотите начать?</legend>
-            ${[["learn", "Я новичок", "4 коротких урока"], ["play", "Сразу в дело", "Компания дня и рейтинг"], ["code", "Пишу код", "Python прямо в браузере"]].map(([k, t, d]) =>
+            ${[["learn", "Я новичок", "Курс с нуля по плану"], ["play", "Сразу в дело", "Компания дня и рейтинг"], ["code", "Пишу код", "Python прямо в браузере"]].map(([k, t, d]) =>
               `<label class="gt-opt"><input type="radio" name="goal" value="${k}"${st.goal === k ? " checked" : ""}><b>${t}</b><small>${d}</small></label>`).join("")}
           </fieldset>
           <p class="gt-err" id="gt-err" role="alert"></p>
@@ -182,19 +182,38 @@
     const err = body.querySelector("#gt-err"); err.textContent = ""; btn.disabled = true;
     const label = btn.innerHTML; btn.innerHTML = '<span class="spin"></span> Подождите…';
     const slow = setTimeout(() => { err.className = "gt-err info"; err.textContent = "Сервер просыпается после простоя — это бывает до минуты. Не закрывайте страницу."; }, 3500);
-    try { const r = await AUTH.api(path, { method: "POST", body: payload, auth: false }); clearTimeout(slow); AUTH.login(r); dispatchEvent(new CustomEvent("fs:auth", { detail: r.user })); welcome(r.user, path === "/api/register"); }
+    try { const r = await AUTH.api(path, { method: "POST", body: payload, auth: false }); clearTimeout(slow); AUTH.login(r); dispatchEvent(new CustomEvent("fs:auth", { detail: r.user }));
+      const isNew = path === "/api/register";
+      if (isNew) return planStep(r.user, true);
+      btn.innerHTML = '<span class="spin"></span> Загружаем ваш план…';
+      const d = window.LEARN ? await LEARN.sync() : null;
+      if (d && !d.plan) planStep(r.user, false); else welcome(r.user, false); }
     catch (e) { clearTimeout(slow); err.className = "gt-err"; err.textContent = e.message; btn.disabled = false; btn.innerHTML = label; if (onErr) onErr(e.message);
       if (!e.status) err.insertAdjacentHTML("beforeend", ` <button type="button" class="gt-link" id="gt-retry">Повторить</button>`), body.querySelector("#gt-retry").onclick = () => btn.click(); }
   }
-  function welcome(user, isNew) {
-    const [href, cta] = GOALS[st.goal];
+  function planStep(user, isNew) {                     // третий шаг: план и график учёбы
+    st.step = 3;
+    body.innerHTML = `${isNew ? steps() : ""}<h1 id="gt-title" class="gt-h">${isNew ? "Последний шаг: ваш план" : "Выберите план учёбы"}</h1>
+      <p class="gt-hint">Как часто и когда вам удобно заниматься. Сайт подскажет, что делать в каждый день, и даст файл для календаря с напоминаниями. Поменять план можно в любой момент.</p>
+      <div id="gt-plan"></div>`;
+    g.querySelector(".gate-tabs").hidden = true;
+    LEARN.picker(body.querySelector("#gt-plan"), { submitLabel: "Сохранить и начать", onSaved: () => welcome(user, isNew, true) });
+    body.querySelector("#gt-title").focus();
+  }
+  function welcome(user, isNew, withPlan) {
+    let [href, cta] = GOALS[st.goal];
+    const pl = window.LEARN && LEARN.plan();
+    if (withPlan && pl) { const s = LEARN.status(pl), first = s.due[0] || (s.nextItem && s.nextItem.id);
+      if (st.goal === "learn" && first) { const it = LEARN.BY[first]; href = it.practice ? it.href : "lessons.html#l=" + first; cta = "Первое занятие: " + it.title; } }
     const here = document.body.dataset.page;
     body.innerHTML = `<div class="gt-welcome"><div class="gt-ava" aria-hidden="true">${esc(AUTH.initials(user.display))}</div>
       <h1 id="gt-title" class="gt-h">${isNew ? "Добро пожаловать" : "Рады видеть"}, ${esc(user.display)}!</h1>
-      <p>${isNew ? "Аккаунт создан. Результаты, достижения и место в рейтинге теперь сохраняются в профиле." : "Вы вошли. Продолжайте с того места, где остановились."}</p>
+      <p>${isNew ? "Аккаунт создан. Результаты, достижения, план и прогресс уроков сохраняются в профиле." : "Вы вошли. Продолжайте с того места, где остановились."}</p>
+      ${withPlan && pl ? `<p class="gt-plan-ok">План: ${UI.esc(LEARN.describe(pl))}. <button type="button" class="gt-link" id="gt-ics">Добавить занятия в календарь</button></p>` : ""}
       <div class="gt-actions center">${isNew && here !== href.split("?")[0].replace(".html", "") ? `<a class="btn" href="${href}">${cta} <span class="arr">→</span></a>` : ""}<button type="button" class="chip" id="gt-stay">${isNew ? "Осмотреться на этой странице" : "Продолжить"}</button></div></div>`;
     g.querySelector(".gate-tabs").hidden = true;
     body.querySelector("#gt-stay").onclick = close;
+    const ic = body.querySelector("#gt-ics"); if (ic) ic.onclick = () => LEARN.downloadIcs(pl);
     (body.querySelector(".gt-welcome a") || body.querySelector("#gt-stay")).focus();
   }
   function close() { g.classList.add("out"); behind.forEach(e => e.removeAttribute("inert")); document.body.classList.remove("gated"); setTimeout(() => g.remove(), 350); }
