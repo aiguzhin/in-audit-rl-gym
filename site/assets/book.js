@@ -21,6 +21,8 @@
   book.insertBefore(leaf, book.querySelector(".ribbon"));
   const fronts = strips.map(s => s.querySelector(".f .pg")), backs = strips.map(s => s.querySelector(".b .pg"));
   const shF = strips.map(s => s.querySelector(".f .sh")), shB = strips.map(s => s.querySelector(".b .sh"));
+  const faceF = strips.map(s => s.querySelector(".fc.f")), faceB = strips.map(s => s.querySelector(".fc.b"));
+  const side = new Int8Array(N).fill(-1);             // какая сторона полосы сейчас показана (Safari не всегда прячет обратную)
   const castR = document.createElement("i"); castR.className = "cast r"; R.append(castR);
   const castL = document.createElement("i"); castL.className = "cast l"; L.append(castL);
 
@@ -71,6 +73,10 @@
     strips[0].style.transform = `translateZ(1.4px) rotateY(${-base}deg)`;
     theta[0] = base;
     for (let i = 1; i < N; i++) { strips[i].style.transform = `rotateY(${-rho[i]}deg)`; cum += rho[i]; theta[i] = cum; }
+    for (let i = 0; i < N; i++) {                                     // показываем только сторону, обращённую к зрителю
+      const s = theta[i] < 90 ? 0 : 1;
+      if (side[i] !== s) { side[i] = s; faceF[i].style.visibility = s ? "hidden" : "visible"; faceB[i].style.visibility = s ? "visible" : "hidden"; }
+    }
     for (let i = 0; i < N; i++) {                                     // освещение: свет сверху
       const c = Math.cos(theta[i] * Math.PI / 180), s = Math.sin(theta[i] * Math.PI / 180);
       shF[i].style.opacity = (Math.max(0, 1 - c) * .32 + s * .06).toFixed(3);
@@ -88,7 +94,7 @@
     const el = (now - t0) / 1000;
     if (phase === "rest" && el > REST) { phase = "turn"; t0 = now; }
     else if (phase === "turn" && el > TURN) { phase = "settle"; t0 = now; }
-    else if (phase === "settle" && el > SETTLE) {                     // лист лёг: незаметно переносим его направо со следующими страницами
+    else if (phase === "settle" && (el > SETTLE || (el > .45 && Math.min(...theta) > 178.5 && Math.max(...vel.map(Math.abs)) < 25))) {                     // лист лёг: незаметно переносим его направо со следующими страницами
       phase = "rest"; t0 = now; n++; base = 0; baseV = 0; rho.fill(0); vel.fill(0); fill();
     }
     const tt = (now - t0) / 1000;

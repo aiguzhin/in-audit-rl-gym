@@ -859,8 +859,9 @@ pre.code .copy{position:absolute;top:14px;right:14px}
 .book3 .leaf2{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-style:preserve-3d;pointer-events:none}
 .book3 .leaf2 .st{position:absolute;top:0;bottom:0;left:100%;width:100%;transform-style:preserve-3d;transform-origin:0 50%;will-change:transform}
 .book3 .leaf2 .st0{left:0;width:calc(100% / 12)}
-.book3 .leaf2 .fc{position:absolute;top:0;bottom:0;left:0;width:calc(100% + .7px);backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.book3 .leaf2 .fc.b{transform:rotateY(180deg)}
+.book3 .leaf2 .fc{position:absolute;top:0;bottom:0;left:0;width:calc(100% + .7px);backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(.01px)}
+.book3 .leaf2 .fc.b{visibility:hidden}
+.book3 .leaf2 .fc.b{transform:rotateY(180deg) translateZ(.01px)}
 .book3 .leaf2 .cut{position:absolute;inset:0;overflow:hidden}
 .book3 .leaf2 .pw{position:absolute;top:0;bottom:0}
 .book3 .leaf2 .pg{position:absolute;inset:0;width:100%;left:0;border-radius:0;box-shadow:none}
