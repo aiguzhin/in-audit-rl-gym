@@ -6,6 +6,20 @@ FinSpector — RL-среда для ИИ-аудитора (кейс FinTech №1
 
 Это среда для возможного дообучения, а не обученная модель. Веса здесь не обучаются, и об улучшении модели проект не заявляет.
 
+## Состав сдачи (раздел 09)
+
+| Что требуется | Где лежит |
+|---|---|
+| Исходный код: генератор и среда, лицензия, зафиксированные зависимости | `auditenv/` (генератор `generator.py`, среда `env.py`), `LICENSE` (MIT), `requirements.txt` (только стандартная библиотека Python 3.11), `api/requirements.txt` (`psycopg[binary]==3.2.3`, нужен только сайту) |
+| README: контейнер и единая команда проверки | этот файл: `python -m auditenv check` или `docker build -t fin-audit-rl . && docker run --rm --network none --cpus 2 --memory 4g fin-audit-rl` |
+| Matcher и награда, схемы и политики | `auditenv/matcher.py` (сопоставление и награда), `auditenv/policy.py` и `episodes/*/*/policy.json` (правила учёта и допуски), схемы действий и выводов — раздел «Контракт среды» ниже |
+| Эпизоды: 10 train и 10 dev | `episodes/train/`, `episodes/dev/` (открытые данные); эталон к ним — `grader_data/` |
+| Тесты среды, сопоставления и награды | `tests/test_all.py`, `tests/test_api.py` (45 тестов, запускаются внутри `check`) |
+| Адаптеры базовых политик | `auditenv/policies.py`: `random_explorer`, `simple_reconciler`, `flag_all`, `oracle` и дополнительно `evidence_reconciler` |
+| Траектории | `trajectories/trajectories.jsonl`: поля `episode_id, step, action, observation, reward, terminated, truncated` (+ `policy`, `split`); 20 эпизодов, в наблюдениях нет закрытого эталона |
+| Записка о дизайне | `DESIGN.md` |
+| Демо | видео `finspector-demo.mp4` в папке сдачи; скриптовая политика: `python -m auditenv demo` |
+
 ## Запуск одной командой
 
 ```bash
